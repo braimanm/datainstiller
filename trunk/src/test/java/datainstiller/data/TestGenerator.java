@@ -1,4 +1,4 @@
-package classturbine.generator.data;
+package datainstiller.data;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,12 +8,11 @@ import java.util.Set;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import classturbine.generator.data.Data2.Data3;
-import classturbine.generator.data.Data2.Data4;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import datainstiller.data.Data;
+import datainstiller.data.Data2.Data3;
+import datainstiller.data.Data2.Data4;
 import datainstiller.data.DataGenerator;
 import datainstiller.data.DataPersistence;
 
@@ -43,7 +42,7 @@ public class TestGenerator extends DataPersistence {
 	@Data(clasz=HashSet.class)
 	Set<String> set;
 	
-	//@Test
+	@Test
 	public void test_generic_functionality(){
 		String xml = generateXML();
 		System.out.println(xml);
@@ -67,7 +66,7 @@ public class TestGenerator extends DataPersistence {
 	}
 	
 	
-	//@Test
+	@Test
 	public void test_inner_classes_generation(){
 		DataGenerator gen = new DataGenerator();
 		Data3 data3 = gen.generate(Data3.class);

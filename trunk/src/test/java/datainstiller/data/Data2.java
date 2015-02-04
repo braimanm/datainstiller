@@ -1,4 +1,4 @@
-package classturbine.generator.data;
+package datainstiller.data;
 
 import datainstiller.data.Data;
 import datainstiller.data.DataPersistence;
