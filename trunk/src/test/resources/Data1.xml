@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<data1>
+  <aliases>
+  	<ALIAS>$[ALPHANUMERIC('([a][b][c]) [d][e][f]-[g][h][i][j]','null')]</ALIAS>
+    <ALIAS2>$[DATE('1945/01/01|1995/12/31|yyyy/MM/dd','dd MMM yyyy')]</ALIAS2>
+    <name>$[HUMAN_NAMES('null','{A} {S}')]</name>
+    <address></address>
+  </aliases>
+  <byte1>0</byte1>
+  <byte2>0</byte2>
+  <short1>0</short1>
+  <short2>0</short2>
+  <int1>0</int1>
+  <int2>0</int2>
+  <long1>0</long1>
+  <long2>0</long2>
+  <float1>0.0</float1>
+  <float2>0.0</float2>
+  <double1>0.0</double1>
+  <double2>0.0</double2>
+  <boolean1>false</boolean1>
+  <boolean2>false</boolean2>
+  <char1>0</char1>
+  <char2>0</char2>
+  <string>${ALIAS}</string>
+  <data>
+    <byte1>0</byte1>
+    <byte2>0</byte2>
+    <short1>0</short1>
+    <short2>0</short2>
+    <int1>0</int1>
+    <int2>0</int2>
+    <long1>0</long1>
+    <long2>0</long2>
+    <float1>0.0</float1>
+    <float2>0.0</float2>
+    <double1>0.0</double1>
+    <double2>0.0</double2>
+    <boolean1>false</boolean1>
+    <boolean2>false</boolean2>
+    <char1>0</char1>
+    <char2>0</char2>
+    <string>${ALIAS2}</string>
+  </data>
+  <list>
+    <string>${ALIAS2}</string>
+    <string>${ALIAS2}</string>
+    <string>${ALIAS2}</string>
+  </list>
+   <set>
+    <string>${name}</string>
+    <string>${name}</string>
+  </set>
+</data1>
