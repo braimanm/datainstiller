@@ -23,6 +23,7 @@ public class Data2 extends DataPersistence {
 	@Data(value = "value2", alias = "ALIAS2")
 	String string;
 	
+	
 	public class Data3 extends DataPersistence {
 		String string;
 	}
