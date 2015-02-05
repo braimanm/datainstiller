@@ -1,7 +1,5 @@
 package datainstiller.data;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,9 +35,7 @@ public class TestGenerator extends DataPersistence {
 	@Data(value = "value", alias = "ALIAS")
 	String string;
 	Data2 data;
-	@Data(clasz=ArrayList.class)
 	List<String> list;
-	@Data(clasz=HashSet.class)
 	Set<String> set;
 	
 	@Test
@@ -48,6 +44,9 @@ public class TestGenerator extends DataPersistence {
 		System.out.println(xml);
 		TestGenerator test = fromXml(xml,this.getClass(),false);
 		Assert.assertEquals(xml, test.toXML());
+		TestGenerator testG = new TestGenerator();
+		testG.generateData();
+		Assert.assertEquals(xml, testG.toXML());
 	}
 	
 	@Test
@@ -68,7 +67,7 @@ public class TestGenerator extends DataPersistence {
 	
 	@Test
 	public void test_inner_classes_generation(){
-		DataGenerator gen = new DataGenerator();
+		DataGenerator gen = DataGenerator.getInstance();
 		Data3 data3 = gen.generate(Data3.class);
 		Assert.assertNull(data3);
 		Data4 data4 =  gen.generate(Data4.class);

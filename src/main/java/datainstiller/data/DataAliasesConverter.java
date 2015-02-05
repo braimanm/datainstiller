@@ -36,12 +36,7 @@ import datainstiller.generators.GeneratorInterface;
  *          During unmarshaling, if alias value is data generator expression then this expression is resolved to data using specific generator. 
  */
 public class DataAliasesConverter implements Converter {
-	DataGenerator classDataGenerator;
-	
-	public DataAliasesConverter(DataGenerator classDataGenerator) {
-		this.classDataGenerator=classDataGenerator;
-	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean canConvert(Class type) {
@@ -74,10 +69,8 @@ public class DataAliasesConverter implements Converter {
 				Matcher matcher = pattern.matcher(value);
 				if (matcher.find() != true) {
 					throw new PatternUnmarshalException(value + " - invalid data generation expression!");
-				}
-				
-				GeneratorInterface genType = classDataGenerator.getGenerator(matcher.group(1).trim());
-			
+				}	
+				GeneratorInterface genType = DataGenerator.getInstance().getGenerator(matcher.group(1).trim());
 				String init = matcher.group(2);
 				String val = matcher.group(3);
 				value = genType.generate(init, val);

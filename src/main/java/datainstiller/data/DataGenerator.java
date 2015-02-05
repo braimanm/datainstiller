@@ -1,15 +1,17 @@
 package datainstiller.data;
 
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import com.thoughtworks.xstream.XStream;
@@ -21,7 +23,6 @@ import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.converters.collections.MapConverter;
 import com.thoughtworks.xstream.converters.enums.EnumConverter;
 import com.thoughtworks.xstream.converters.enums.EnumSetConverter;
-import com.thoughtworks.xstream.converters.extended.ISO8601GregorianCalendarConverter;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
 import com.thoughtworks.xstream.core.util.Primitives;
 
@@ -35,15 +36,17 @@ import datainstiller.generators.HumanNameGenerator;
 import datainstiller.generators.NumberGenerator;
 import datainstiller.generators.WordGenerator;
 
-
 public class DataGenerator {
 	private int nArray = 3;
 	private int recursionLevel = 0; 
 	private Map<String,Integer> classes;
 	private FieldDataStore fieldDataStore;
-	private XStream xstream;
 	private Map<String,GeneratorInterface> generatorStore;
+	private XStream xstream;
+	private static DataGenerator dataGenerator; 
 	
+	private DataGenerator() {
+	}
 	
 	public GeneratorInterface getGenerator(String generator){
 		return  generatorStore.get(generator);
@@ -53,34 +56,41 @@ public class DataGenerator {
 		generatorStore.put(key, generator);
 	}
 	
-	public DataGenerator() {
-		fieldDataStore = new FieldDataStore();
-		xstream = new XStream();
-		xstream.registerConverter(new ISO8601GregorianCalendarConverter());
-		xstream.registerConverter(new DataAliasesConverter(this));
-		generatorStore = new HashMap<>();
-		registerGenerator("ADDRESS", new AddressGenerator());
-		registerGenerator("ALPHANUMERIC", new AlphaNumericGenerator());
-		registerGenerator("CUSTOM_LIST",new CustomListGenerator());
-		registerGenerator("DATE",new DateGenerator());
-		registerGenerator("HUMAN_NAMES",new HumanNameGenerator());
-		registerGenerator("WORD",new WordGenerator());
-		registerGenerator("NUMBER",new NumberGenerator());
-		registerGenerator("FILE2LIST",new File2ListGenerator());
+	void instXStream(List<SingleValueConverter> singleValueConverters){
+		xstream = DataPersistence.getXstream();
+		if (singleValueConverters==null) {
+			return;
+		}
+		for (SingleValueConverter converter : singleValueConverters){
+			xstream.registerConverter(converter);
+		}
 	}
 	
-	public void registerXStreamConverter(SingleValueConverter converter){
-		xstream.registerConverter(converter);
+	
+	public static DataGenerator getInstance(){
+		return getInstance(null);
 	}
 	
-	public void registerXStreamConverter(Converter converter){
-		xstream.registerConverter(converter);
+	public static DataGenerator getInstance(List<SingleValueConverter> singleValueConverters) {
+		if (dataGenerator!=null){
+			dataGenerator.instXStream(singleValueConverters);
+			return dataGenerator;
+		} 
+		dataGenerator = new DataGenerator();
+		dataGenerator.fieldDataStore = new FieldDataStore();
+		dataGenerator.generatorStore = new HashMap<>();
+		dataGenerator.registerGenerator("ADDRESS", new AddressGenerator());
+		dataGenerator.registerGenerator("ALPHANUMERIC", new AlphaNumericGenerator());
+		dataGenerator.registerGenerator("CUSTOM_LIST",new CustomListGenerator());
+		dataGenerator.registerGenerator("DATE",new DateGenerator());
+		dataGenerator.registerGenerator("HUMAN_NAMES",new HumanNameGenerator());
+		dataGenerator.registerGenerator("WORD",new WordGenerator());
+		dataGenerator.registerGenerator("NUMBER",new NumberGenerator());
+		dataGenerator.registerGenerator("FILE2LIST",new File2ListGenerator());
+		dataGenerator.instXStream(singleValueConverters);
+		return dataGenerator;
 	}
-	
-	public XStream getXStream(){
-		return xstream;
-	}
-	
+		
 	public int getRecursionLevel() {
 		return recursionLevel;
 	}
@@ -195,6 +205,11 @@ public class DataGenerator {
 		return String.class;
 	}
 	
+	public void generate(Object object){
+		Object obj = generate(object.getClass());
+		xstream.fromXML(xstream.toXML(obj),object);
+	}
+	
 	public <T> T generate(Class<T> cls) {
 		if (isInnerClass(cls)){
 			return null;
@@ -263,6 +278,12 @@ public class DataGenerator {
 					}
 				}	
 			}
+			Class[] collection = new Class[]{ArrayList.class,HashSet.class,HashMap.class};
+			for (Class<?> clz: collection){
+				if (cls.isAssignableFrom(clz)){
+					return (T) generate(clz, ffield,arrayOrColection);
+				}
+			}	
 			System.err.println("[WARNING] Please provide implimentation class for " + cls.getCanonicalName() + " field '" + ffield + "'");
 			return null;
 		} 

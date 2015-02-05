@@ -28,6 +28,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.converters.extended.ISO8601GregorianCalendarConverter;
 
 /**
  * @author Michael Braiman braimanm@gmail.com
@@ -49,12 +50,18 @@ public class DataPersistence {
 	protected String schemaLocation;
 	
 	protected DataAliases aliases;
-	@XStreamOmitField
-	protected static DataGenerator dataGenerator = new DataGenerator();
+
 	
-	protected static XStream initXstream(Class<?> clz){
-		XStream xstream = dataGenerator.getXStream();
-		xstream.processAnnotations(clz);
+	public static XStream getXstream() {
+		return getXstream(null);
+	}
+	
+	 protected static XStream getXstream(Class<?> clz){
+		XStream xstream = new XStream();
+		xstream.registerConverter(new ISO8601GregorianCalendarConverter());
+		if (clz != null ){
+			xstream.processAnnotations(clz);
+		}
 		return xstream;
 	}
 	
@@ -67,7 +74,7 @@ public class DataPersistence {
 			String value = aliases.get(key);
 			xml = xml.replace(alias, value); 
 		}
-		return initXstream(forClass).fromXML(xml);
+		return getXstream(forClass).fromXML(xml);
 	}
 	
 	/**
@@ -78,7 +85,7 @@ public class DataPersistence {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends DataPersistence> T fromXml(String xml, Class<T> forClass, boolean resolveAliases){	
-		T data = (T) initXstream(forClass).fromXML(xml);
+		T data = (T) getXstream(forClass).fromXML(xml);
 		if (resolveAliases) {
 			data = (T) resolveAliases(data,forClass);
 		}
@@ -93,7 +100,7 @@ public class DataPersistence {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends DataPersistence> T fromURL(URL url, Class<T> forClass, boolean resolveAliases){
-		T data=(T) initXstream(forClass).fromXML(url);
+		T data=(T) getXstream(forClass).fromXML(url);
 		if (resolveAliases) {
 			data = (T) resolveAliases(data,forClass);
 		}
@@ -109,7 +116,7 @@ public class DataPersistence {
 	
 	@SuppressWarnings("unchecked")
 	public static <T extends DataPersistence> T fromInputStream(InputStream inputStream,Class<T> forClass, boolean resolveAliases){
-		T data=(T) initXstream(forClass).fromXML(inputStream);
+		T data=(T) getXstream(forClass).fromXML(inputStream);
 		if (resolveAliases) {
 			data = (T) resolveAliases(data,forClass);
 		}
@@ -139,7 +146,7 @@ public class DataPersistence {
 		if (!file.exists()){
 			throw new RuntimeException("File " + filePath + " was not found");
 		}
-		T data=(T) initXstream(forClass).fromXML(file);
+		T data=(T) getXstream(forClass).fromXML(file);
 		if (resolveAliases) {
 			data = (T) resolveAliases(data,forClass);
 		}
@@ -152,7 +159,7 @@ public class DataPersistence {
 	 */
 	public String toXML(){
 		String header="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n";
-		XStream xstream=initXstream(this.getClass());
+		XStream xstream=getXstream(this.getClass());
 		String xml=xstream.toXML(this);
 		return header + xml;
 	}
@@ -168,7 +175,7 @@ public class DataPersistence {
 			fos=new FileOutputStream(filePath);
 			writer=new OutputStreamWriter(fos, "UTF-8");
 			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n");
-			initXstream(this.getClass()).toXML(this, writer);
+			getXstream(this.getClass()).toXML(this, writer);
 		} catch ( IOException e) {
 			throw new RuntimeException(e);
 		} finally{
@@ -182,10 +189,25 @@ public class DataPersistence {
 		}
 	}
 	
+	
+	/**
+	 * Copying one object to another
+	 * @param source object to copy from
+	 * @param target object to copy to
+	 */
+	public static void deepCopy(Object source,Object target){
+		XStream xstream=getXstream();
+		String xml=xstream.toXML(source);
+		xstream.fromXML(xml,target);
+	}
+	
+	public void generateData(){
+		DataGenerator.getInstance().generate(this);
+	}
+	
 	public String generateXML(){
-		DataPersistence obj = dataGenerator.generate(this.getClass());
+		DataPersistence obj = DataGenerator.getInstance().generate(this.getClass());
 		return obj.toXML();
-		
 	}
 	
 }

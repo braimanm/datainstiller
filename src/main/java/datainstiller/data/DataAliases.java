@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 /**
@@ -29,6 +30,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
  * 			This class represents aliases map. The only reason to have this class is for serialization and deserialization
  * 			of aliases by special XStream converter {@link DataAliasesConverter}. This class implements Map interface.    
  */
+@XStreamConverter(DataAliasesConverter.class)
 public class DataAliases implements Map<String, String> {
 	@XStreamOmitField
 	Map<String, String> map;
