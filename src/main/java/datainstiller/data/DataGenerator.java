@@ -1,3 +1,19 @@
+/*
+Copyright 2010-2012 Michael Braiman
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
 package datainstiller.data;
 
 import java.lang.reflect.Array;
@@ -14,7 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
@@ -39,11 +54,11 @@ import datainstiller.generators.WordGenerator;
 public class DataGenerator {
 	private int nArray = 3;
 	private int recursionLevel = 0; 
-	private Map<String,Integer> classes;
 	private FieldDataStore fieldDataStore;
+	private Map<String,Integer> classes;
 	private Map<String,GeneratorInterface> generatorStore;
-	private XStream xstream;
 	private static DataGenerator dataGenerator; 
+	private GenConverterLookup genConvertorLookup;
 	
 	private DataGenerator() {
 	}
@@ -55,17 +70,12 @@ public class DataGenerator {
 	public void registerGenerator(String key, GeneratorInterface generator){
 		generatorStore.put(key, generator);
 	}
-	
-	void instXStream(List<SingleValueConverter> singleValueConverters){
-		xstream = DataPersistence.getXstream();
-		if (singleValueConverters==null) {
-			return;
-		}
-		for (SingleValueConverter converter : singleValueConverters){
-			xstream.registerConverter(converter);
-		}
+		
+	private GenConverterLookup getConverterLookup(){
+	    //Flush the cache to get new instance of converter for each converter lookup
+	    genConvertorLookup.getConverterLookup().flushCache();
+	    return genConvertorLookup;
 	}
-	
 	
 	public static DataGenerator getInstance(){
 		return getInstance(null);
@@ -73,7 +83,6 @@ public class DataGenerator {
 	
 	public static DataGenerator getInstance(List<SingleValueConverter> singleValueConverters) {
 		if (dataGenerator!=null){
-			dataGenerator.instXStream(singleValueConverters);
 			return dataGenerator;
 		} 
 		dataGenerator = new DataGenerator();
@@ -87,7 +96,12 @@ public class DataGenerator {
 		dataGenerator.registerGenerator("WORD",new WordGenerator());
 		dataGenerator.registerGenerator("NUMBER",new NumberGenerator());
 		dataGenerator.registerGenerator("FILE2LIST",new File2ListGenerator());
-		dataGenerator.instXStream(singleValueConverters);
+		dataGenerator.genConvertorLookup = new GenConverterLookup();
+        if (singleValueConverters!=null) {
+            for (SingleValueConverter converter : singleValueConverters){
+                dataGenerator.genConvertorLookup.registerConverter(converter);
+            }
+        }
 		return dataGenerator;
 	}
 		
@@ -173,7 +187,7 @@ public class DataGenerator {
 				if (data.fieldName().trim().isEmpty()){
 					throw new AnnotationProcessingException("Field 'fieldName' must be provided in MetaData annotation" + data);
 				}
-				setFieldData(cls,data.fieldName(),new FieldData(data));
+				fieldDataStore.setData(cls, data.fieldName(), new FieldData(data));
 			}
 		}
 		for (Field field : clasz.getDeclaredFields()){
@@ -183,7 +197,7 @@ public class DataGenerator {
 			}
 			//MetaData annotation overrides Data annotation
 			if (!fieldDataStore.containsKey(field)){
-				setFieldData(field, new FieldData(data));
+			    fieldDataStore.setData(field, new FieldData(data));
 			}
 		}
 	}
@@ -203,11 +217,6 @@ public class DataGenerator {
 			}
 		}
 		return String.class;
-	}
-	
-	public void generate(Object object){
-		Object obj = generate(object.getClass());
-		xstream.fromXML(xstream.toXML(obj),object);
 	}
 	
 	public <T> T generate(Class<T> cls) {
@@ -247,7 +256,8 @@ public class DataGenerator {
 	@SuppressWarnings({ "unchecked", "rawtypes", "restriction" })
 	private <T> T generate(Class<T> cls, Field ffield,boolean arrayOrColection) {
 		processAnnotations(cls);
-		Converter conv = xstream.getConverterLookup().lookupConverterForType(cls);
+
+		Converter conv = getConverterLookup().getConverterLookup().lookupConverterForType(cls);
 		
 		if (conv instanceof SingleValueConverter){
 			String stringValue = generateValueForField(cls,ffield);
@@ -348,7 +358,7 @@ public class DataGenerator {
 		    	classes.put(key, i);
 		    }
 			
-			Object obj = xstream.getReflectionProvider().newInstance(cls);
+			Object obj = getConverterLookup().getReflectionProvider().newInstance(cls);
 			for (Field field : cls.getDeclaredFields()){
 				if (isInnerClass(field.getType())){
 					System.err.println("          Field '" + field.getName() +"' was skipped by generator." );
@@ -370,9 +380,9 @@ public class DataGenerator {
 				try {
 					field.set(obj, value);
 				} catch (IllegalArgumentException | IllegalAccessException e) {
-					//skip
+					throw new RuntimeException(e);
 				}  catch (NullPointerException e){
-					//skip
+					throw new RuntimeException(e);
 				}
 			}
 			return (T) obj;
@@ -385,14 +395,6 @@ public class DataGenerator {
 		
 		System.err.println("[WARNING] No generator was found for " + conv);
 		return null;
-	}
-
-	public void setFieldData(Class<?> clasz, String fieldName,FieldData fieldData) {
-		fieldDataStore.setData(clasz, fieldName, fieldData);
-	}
-
-	public void setFieldData(Field field,FieldData fieldData) {
-		fieldDataStore.setData(field,fieldData);
 	}
 	
 }

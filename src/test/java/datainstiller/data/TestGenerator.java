@@ -12,7 +12,6 @@ import datainstiller.data.Data;
 import datainstiller.data.Data2.Data3;
 import datainstiller.data.Data2.Data4;
 import datainstiller.data.DataGenerator;
-import datainstiller.data.DataPersistence;
 
 @XStreamAlias("data1")
 public class TestGenerator extends DataPersistence {
@@ -41,8 +40,7 @@ public class TestGenerator extends DataPersistence {
 	@Test
 	public void test_generic_functionality(){
 		String xml = generateXML();
-		System.out.println(xml);
-		TestGenerator test = fromXml(xml,this.getClass(),false);
+		TestGenerator test = fromXml(xml,false);
 		Assert.assertEquals(xml, test.toXML());
 		TestGenerator testG = new TestGenerator();
 		testG.generateData();
@@ -51,8 +49,8 @@ public class TestGenerator extends DataPersistence {
 	
 	@Test
 	public void test_generators_and_aliases(){
-		 TestGenerator test = DataPersistence.fromResource("Data1.xml", this.getClass(), true);
-		 Assert.assertNull(test.aliases);
+		 TestGenerator test = new TestGenerator().fromResource("Data1.xml", true);
+		 Assert.assertNull(test.getDataAliases());
 		 Assert.assertTrue(test.string.matches("\\(\\d{3}\\) \\d{3}-\\d{4}"));
 		 Assert.assertTrue(test.data.string.matches("\\d{2} \\D+ \\d{4}"));
 		 for (String data : test.list){
@@ -61,7 +59,6 @@ public class TestGenerator extends DataPersistence {
 		 for (String data : test.set ){
 			 Assert.assertTrue(data.matches("\\w+ \\w+"));
 		 }
-		 System.out.println(test.toXML());
 	}
 	
 	
