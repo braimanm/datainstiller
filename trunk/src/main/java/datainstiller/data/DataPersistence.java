@@ -141,9 +141,16 @@ public abstract class DataPersistence {
 	 * @param forClass class to deserialize
 	 * @return deserialized object
 	 */
-	public  <T extends DataPersistence> T fromResource(String resourceFile, boolean resolveAliases){
-		URL url=Thread.currentThread().getContextClassLoader().getResource(resourceFile);
-		return fromURL(url, resolveAliases);
+	public  <T extends DataPersistence> T fromResource(String resourceFilePath, boolean resolveAliases){
+		URL url=Thread.currentThread().getContextClassLoader().getResource(resourceFilePath);
+		if (url!=null) {
+			return fromURL(url, resolveAliases);
+		}
+		File file=new File(resourceFilePath);
+		if (file.exists()){
+			return fromFile(file.getAbsolutePath(), resolveAliases);
+		}
+		throw new RuntimeException("File '" + resourceFilePath + "' was not found!");
 	}
 	
 	public  <T extends DataPersistence> T fromResource(String resourceFile){
