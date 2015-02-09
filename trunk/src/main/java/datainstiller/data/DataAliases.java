@@ -27,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 /**
  * @author Michael Braiman braimanm@gmail.com
  * 			<p/>
- * 			This class represents aliases map. The only reason to have this class is for serialization and deserialization
+ * 			This class represents aliases store. The only reason to have this class is for serialization and deserialization
  * 			of aliases by special XStream converter {@link DataAliasesConverter}. This class implements Map interface.    
  */
 @XStreamConverter(DataAliasesConverter.class)

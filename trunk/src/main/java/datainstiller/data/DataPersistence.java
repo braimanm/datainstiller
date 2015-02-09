@@ -36,7 +36,7 @@ import com.thoughtworks.xstream.converters.extended.ISO8601GregorianCalendarConv
  * This class encapsulate object persistence capabilities. It allows to persist any derived from this class object with all his data.
  * All the class members which are not annotated with {@link XStreamOmitField} are serialized and deserialized to and from various formats 
  */
-public class DataPersistence {
+public abstract class DataPersistence {
 	@XStreamAlias("xmlns")
 	@XStreamAsAttribute
 	protected String xmlns;
@@ -49,23 +49,23 @@ public class DataPersistence {
 	@XStreamAsAttribute
 	protected String schemaLocation;
 	
-	protected DataAliases aliases;
-
+	private DataAliases aliases;
 	
-	public static XStream getXstream() {
-		return getXstream(null);
+	public DataAliases getDataAliases(){
+		return aliases;
 	}
 	
-	 protected static XStream getXstream(Class<?> clz){
+	 protected DataPersistence(){
+	 }
+	
+	 protected XStream getXstream(){
 		XStream xstream = new XStream();
 		xstream.registerConverter(new ISO8601GregorianCalendarConverter());
-		if (clz != null ){
-			xstream.processAnnotations(clz);
-		}
+		xstream.processAnnotations(this.getClass());
 		return xstream;
 	}
 	
-	protected static <T extends DataPersistence> Object resolveAliases(DataPersistence data, Class<T> forClass) {
+	private  <T extends DataPersistence> Object resolveAliases(DataPersistence data) {
 		DataAliases aliases = data.aliases;
 		data.aliases = null;
 		String xml = data.toXML();
@@ -74,7 +74,7 @@ public class DataPersistence {
 			String value = aliases.get(key);
 			xml = xml.replace(alias, value); 
 		}
-		return getXstream(forClass).fromXML(xml);
+		return getXstream().fromXML(xml);
 	}
 	
 	/**
@@ -84,12 +84,16 @@ public class DataPersistence {
 	 * @return deserialized object
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends DataPersistence> T fromXml(String xml, Class<T> forClass, boolean resolveAliases){	
-		T data = (T) getXstream(forClass).fromXML(xml);
+	public  <T extends DataPersistence> T fromXml(String xml, boolean resolveAliases){	
+		T data = (T) getXstream().fromXML(xml);
 		if (resolveAliases) {
-			data = (T) resolveAliases(data,forClass);
+			data = (T) resolveAliases(data);
 		}
 		return data;
+	}
+	
+	public  <T extends DataPersistence> T fromXml(String xml) {
+		return fromXml(xml,false);
 	}
 	
 	/**
@@ -99,12 +103,16 @@ public class DataPersistence {
 	 * @return deserialized object
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends DataPersistence> T fromURL(URL url, Class<T> forClass, boolean resolveAliases){
-		T data=(T) getXstream(forClass).fromXML(url);
+	public  <T extends DataPersistence> T fromURL(URL url, boolean resolveAliases){
+		T data=(T) getXstream().fromXML(url);
 		if (resolveAliases) {
-			data = (T) resolveAliases(data,forClass);
+			data = (T) resolveAliases(data);
 		}
 		return  data;
+	}
+	
+	public  <T extends DataPersistence> T fromURL(URL url){
+		return fromURL(url,false);
 	}
 	
 	/**
@@ -115,12 +123,16 @@ public class DataPersistence {
 	 */
 	
 	@SuppressWarnings("unchecked")
-	public static <T extends DataPersistence> T fromInputStream(InputStream inputStream,Class<T> forClass, boolean resolveAliases){
-		T data=(T) getXstream(forClass).fromXML(inputStream);
+	public  <T extends DataPersistence> T fromInputStream(InputStream inputStream, boolean resolveAliases){
+		T data=(T) getXstream().fromXML(inputStream);
 		if (resolveAliases) {
-			data = (T) resolveAliases(data,forClass);
+			data = (T) resolveAliases(data);
 		}
 		return data;
+	}
+	
+	public  <T extends DataPersistence> T fromInputStream(InputStream inputStream) {
+		return fromInputStream(inputStream,false);
 	}
 	
 	/**
@@ -129,9 +141,13 @@ public class DataPersistence {
 	 * @param forClass class to deserialize
 	 * @return deserialized object
 	 */
-	public static <T extends DataPersistence> T fromResource(String resourceFile,Class<T> forClass, boolean resolveAliases){
+	public  <T extends DataPersistence> T fromResource(String resourceFile, boolean resolveAliases){
 		URL url=Thread.currentThread().getContextClassLoader().getResource(resourceFile);
-		return fromURL(url, forClass, resolveAliases);
+		return fromURL(url, resolveAliases);
+	}
+	
+	public  <T extends DataPersistence> T fromResource(String resourceFile){
+		return fromResource(resourceFile, false);
 	}
 	
 	/**
@@ -141,25 +157,29 @@ public class DataPersistence {
 	 * @return deserialized object
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends DataPersistence> T fromFile(String filePath, Class<T> forClass, boolean resolveAliases){
+	public  <T extends DataPersistence> T fromFile(String filePath, boolean resolveAliases){
 		File file=new File(filePath);
 		if (!file.exists()){
 			throw new RuntimeException("File " + filePath + " was not found");
 		}
-		T data=(T) getXstream(forClass).fromXML(file);
+		T data=(T) getXstream().fromXML(file);
 		if (resolveAliases) {
-			data = (T) resolveAliases(data,forClass);
+			data = (T) resolveAliases(data);
 		}
 		return data;
 	}
 
+	public  <T extends DataPersistence> T fromFile(String filePath){
+		return fromFile(filePath, false);
+	}
+	
 	/**
 	 * This method serializes this object to the given XML string
 	 * @return XML representation of this object 
 	 */
 	public String toXML(){
 		String header="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n";
-		XStream xstream=getXstream(this.getClass());
+		XStream xstream=getXstream();
 		String xml=xstream.toXML(this);
 		return header + xml;
 	}
@@ -175,7 +195,7 @@ public class DataPersistence {
 			fos=new FileOutputStream(filePath);
 			writer=new OutputStreamWriter(fos, "UTF-8");
 			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n");
-			getXstream(this.getClass()).toXML(this, writer);
+			getXstream().toXML(this, writer);
 		} catch ( IOException e) {
 			throw new RuntimeException(e);
 		} finally{
@@ -189,20 +209,20 @@ public class DataPersistence {
 		}
 	}
 	
-	
 	/**
 	 * Copying one object to another
 	 * @param source object to copy from
 	 * @param target object to copy to
 	 */
-	public static void deepCopy(Object source,Object target){
+	public void deepCopy(DataPersistence source, DataPersistence target){
 		XStream xstream=getXstream();
 		String xml=xstream.toXML(source);
 		xstream.fromXML(xml,target);
 	}
 	
 	public void generateData(){
-		DataGenerator.getInstance().generate(this);
+		DataPersistence obj = DataGenerator.getInstance().generate(this.getClass());
+		deepCopy(obj, this);
 	}
 	
 	public String generateXML(){
