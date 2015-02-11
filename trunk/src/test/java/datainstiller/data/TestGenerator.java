@@ -64,11 +64,24 @@ public class TestGenerator extends DataPersistence {
 	
 	@Test
 	public void test_inner_classes_generation(){
-		DataGenerator gen = DataGenerator.getInstance();
+		DataGenerator gen = new DataGenerator();
 		Data3 data3 = gen.generate(Data3.class);
 		Assert.assertNull(data3);
 		Data4 data4 =  gen.generate(Data4.class);
 		Assert.assertNotNull(data4.string);
+	}
+	
+	@Test
+	public void test(){
+		DataGenerator gen = new DataGenerator();
+		System.out.println(gen.getGenerator("ADDRESS").generate("{#} {S}, {T}, {O}, {K} ({P})",null));
+		System.out.println(gen.getGenerator("ALPHANUMERIC").generate("{A}{B}{C}{D}(a)(A)(a)",null));
+		System.out.println(gen.getGenerator("CUSTOM_LIST").generate(null, "aaa,bbb,ccc,ddd"));
+		System.out.println(gen.getGenerator("DATE").generate("2010/01/01|2013/12/31|yyyy/MM/dd","dd MMM yyyy"));
+		System.out.println(gen.getGenerator("HUMAN_NAMES").generate(null,"{M} and {F} {S}"));
+		System.out.println(gen.getGenerator("NUMBER").generate("-100,100", "##.000"));
+		System.out.println(gen.getGenerator("WORD").generate("{a} {b}",null));
+
 	}
 
 }

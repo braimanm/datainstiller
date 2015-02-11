@@ -57,10 +57,29 @@ public class DataGenerator {
 	private FieldDataStore fieldDataStore;
 	private Map<String,Integer> classes;
 	private Map<String,GeneratorInterface> generatorStore;
-	private static DataGenerator dataGenerator; 
 	private GenConverterLookup genConvertorLookup;
 	
-	private DataGenerator() {
+	public DataGenerator() {
+		this(null);
+	}
+	
+	public DataGenerator(List<SingleValueConverter> singleValueConverters){
+		fieldDataStore = new FieldDataStore();
+		generatorStore = new HashMap<>();
+		registerGenerator("ADDRESS", new AddressGenerator());
+		registerGenerator("ALPHANUMERIC", new AlphaNumericGenerator());
+		registerGenerator("CUSTOM_LIST",new CustomListGenerator());
+		registerGenerator("DATE",new DateGenerator());
+		registerGenerator("HUMAN_NAMES",new HumanNameGenerator());
+		registerGenerator("WORD",new WordGenerator());
+		registerGenerator("NUMBER",new NumberGenerator());
+		registerGenerator("FILE2LIST",new File2ListGenerator());
+		genConvertorLookup = new GenConverterLookup();
+        if (singleValueConverters!=null) {
+            for (SingleValueConverter converter : singleValueConverters){
+                genConvertorLookup.registerConverter(converter);
+            }
+        }
 	}
 	
 	public GeneratorInterface getGenerator(String generator){
@@ -75,34 +94,6 @@ public class DataGenerator {
 	    //Flush the cache to get new instance of converter for each converter lookup
 	    genConvertorLookup.getConverterLookup().flushCache();
 	    return genConvertorLookup;
-	}
-	
-	public static DataGenerator getInstance(){
-		return getInstance(null);
-	}
-	
-	public static DataGenerator getInstance(List<SingleValueConverter> singleValueConverters) {
-		if (dataGenerator!=null){
-			return dataGenerator;
-		} 
-		dataGenerator = new DataGenerator();
-		dataGenerator.fieldDataStore = new FieldDataStore();
-		dataGenerator.generatorStore = new HashMap<>();
-		dataGenerator.registerGenerator("ADDRESS", new AddressGenerator());
-		dataGenerator.registerGenerator("ALPHANUMERIC", new AlphaNumericGenerator());
-		dataGenerator.registerGenerator("CUSTOM_LIST",new CustomListGenerator());
-		dataGenerator.registerGenerator("DATE",new DateGenerator());
-		dataGenerator.registerGenerator("HUMAN_NAMES",new HumanNameGenerator());
-		dataGenerator.registerGenerator("WORD",new WordGenerator());
-		dataGenerator.registerGenerator("NUMBER",new NumberGenerator());
-		dataGenerator.registerGenerator("FILE2LIST",new File2ListGenerator());
-		dataGenerator.genConvertorLookup = new GenConverterLookup();
-        if (singleValueConverters!=null) {
-            for (SingleValueConverter converter : singleValueConverters){
-                dataGenerator.genConvertorLookup.registerConverter(converter);
-            }
-        }
-		return dataGenerator;
 	}
 		
 	public int getRecursionLevel() {
