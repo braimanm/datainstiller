@@ -14,7 +14,15 @@
         <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         <distribution>repo</distribution>
       </license>
-  </licenses>
+  	</licenses>
+  	<description>This project allows to instantiate any given Java class with randomly generated data.</description>
+  	<scm>
+  		<url>https://code.google.com/p/datainstiller/</url>
+  		<connection>scm:svn:http://datainstiller.googlecode.com/svn/</connection>
+  		<developerConnection>scm:svn:http://datainstiller.googlecode.com/svn/</developerConnection>
+  	</scm>
+  
+  
   <developers>
     <developer>
       <name>Michael Braiman</name>
@@ -91,4 +99,5 @@
       </repository>
   </distributionManagement>
   
+ 
 </project>

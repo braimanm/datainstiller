@@ -228,12 +228,12 @@ public abstract class DataPersistence {
 	}
 	
 	public void generateData(){
-		DataPersistence obj = DataGenerator.getInstance().generate(this.getClass());
+		DataPersistence obj = new DataGenerator().generate(this.getClass());
 		deepCopy(obj, this);
 	}
 	
 	public String generateXML(){
-		DataPersistence obj = DataGenerator.getInstance().generate(this.getClass());
+		DataPersistence obj = new DataGenerator().generate(this.getClass());
 		return obj.toXML();
 	}
 	
