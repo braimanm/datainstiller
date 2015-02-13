@@ -75,11 +75,9 @@ public class DataGenerator {
 		registerGenerator("WORD",new WordGenerator());
 		registerGenerator("NUMBER",new NumberGenerator());
 		registerGenerator("FILE2LIST",new File2ListGenerator());
-		//genConvertorLookup = new GenConverterLookup();
 		xstream = new XStream();
         if (converters!=null) {
             for (Converter converter : converters){
-                //genConvertorLookup.registerConverter(converter);
             	xstream.registerConverter(converter);
             }
         }
@@ -92,12 +90,6 @@ public class DataGenerator {
 	public void registerGenerator(String key, GeneratorInterface generator){
 		generatorStore.put(key, generator);
 	}
-		
-//	private GenConverterLookup getConverterLookup(){
-//	    //Flush the cache to get new instance of converter for each converter lookup
-//	    genConvertorLookup.flushCache();
-//	    return genConvertorLookup;
-//	}
 		
 	public int getRecursionLevel() {
 		return recursionLevel;
@@ -189,7 +181,6 @@ public class DataGenerator {
 			if (data==null){
 				continue;
 			}
-			//MetaData annotation overrides Data annotation
 			if (!fieldDataStore.containsKey(field)){
 			    fieldDataStore.setData(field, new FieldData(data));
 			}
@@ -251,7 +242,6 @@ public class DataGenerator {
 	private <T> T generate(Class<T> cls, Field ffield,boolean arrayOrColection) {
 		processAnnotations(cls);
 
-		//Converter conv = getConverterLookup().lookupConverterForType(cls);
 		Converter conv = xstream.getConverterLookup().lookupConverterForType(cls);
 		
 		if (conv instanceof DataValueConverter) {
@@ -359,34 +349,37 @@ public class DataGenerator {
 		    	classes.put(key, i);
 		    }
 			
-			//Object obj = getConverterLookup().getReflectionProvider().newInstance(cls);
 			Object obj = xstream.getReflectionProvider().newInstance(cls);
-			for (Field field : cls.getDeclaredFields()){
-				if (isInnerClass(field.getType())){
-					System.err.println("          Field '" + field.getName() +"' was skipped by generator." );
-					continue;
+			Class superCls = cls;
+			do {	
+				for (Field field : superCls.getDeclaredFields()){
+					if (isInnerClass(field.getType())){
+						System.err.println("          Field '" + field.getName() +"' was skipped by generator." );
+						continue;
+					}
+					field.setAccessible(true);
+					FieldData fieldData = fieldDataStore.getData(field);
+					if (fieldData!=null && fieldData.skip()){ 
+						continue;
+					}
+					if (field.isAnnotationPresent(XStreamOmitField.class)){
+						continue;
+					}
+					if (Modifier.isStatic(field.getModifiers())){
+						continue;
+					}
+					
+					Object value = generate(field.getType(),field,false);
+					try {
+						field.set(obj, value);
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						throw new RuntimeException(e);
+					}  catch (NullPointerException e){
+						throw new RuntimeException(e);
+					}
 				}
-				field.setAccessible(true);
-				FieldData fieldData = fieldDataStore.getData(field);
-				if (fieldData!=null && fieldData.skip()){ 
-					continue;
-				}
-				if (field.isAnnotationPresent(XStreamOmitField.class)){
-					continue;
-				}
-				if (Modifier.isStatic(field.getModifiers())){
-					continue;
-				}
-				
-				Object value = generate(field.getType(),field,false);
-				try {
-					field.set(obj, value);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new RuntimeException(e);
-				}  catch (NullPointerException e){
-					throw new RuntimeException(e);
-				}
-			}
+				superCls = superCls.getSuperclass();
+			} while (superCls!=null);
 			return (T) obj;
 		}
 		
