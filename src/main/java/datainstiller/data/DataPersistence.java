@@ -48,7 +48,7 @@ public abstract class DataPersistence {
 	@XStreamAlias("xsi:schemaLocation")
 	@XStreamAsAttribute
 	protected String schemaLocation;
-	
+	@Data(skip=true)
 	private DataAliases aliases;
 	
 	public DataAliases getDataAliases(){

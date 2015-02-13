@@ -40,6 +40,7 @@ public class TestGenerator extends DataPersistence {
 	@Test
 	public void test_generic_functionality(){
 		String xml = generateXML();
+		System.out.println(xml);
 		TestGenerator test = fromXml(xml,false);
 		Assert.assertEquals(xml, test.toXML());
 		TestGenerator testG = new TestGenerator();

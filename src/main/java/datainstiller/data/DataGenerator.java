@@ -176,15 +176,19 @@ public class DataGenerator {
 				fieldDataStore.setData(cls, data.fieldName(), new FieldData(data));
 			}
 		}
-		for (Field field : clasz.getDeclaredFields()){
-			Data data = field.getAnnotation(Data.class);
-			if (data==null){
-				continue;
+		Class<?> superClasz = clasz;
+		do {
+			for (Field field : superClasz.getDeclaredFields()){
+				Data data = field.getAnnotation(Data.class);
+				if (data==null){
+					continue;
+				}
+				if (!fieldDataStore.containsKey(field)){
+				    fieldDataStore.setData(field, new FieldData(data));
+				}
 			}
-			if (!fieldDataStore.containsKey(field)){
-			    fieldDataStore.setData(field, new FieldData(data));
-			}
-		}
+			superClasz = superClasz.getSuperclass();
+		} while (superClasz!=null);
 	}
 	
 	@SuppressWarnings("restriction")
@@ -230,6 +234,7 @@ public class DataGenerator {
 				}
 				clz=clz.getSuperclass();
 			} while(clz!=null);
+			
 			if (!dataAliasesFound) {
 				throw new AliasWriteException("Can't save aliases! The generated class or its supper class should have DataAliases type field declared.");
 			}
