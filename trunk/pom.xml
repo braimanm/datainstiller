@@ -4,9 +4,9 @@
 
     <groupId>com.googlecode.datainstiller</groupId>
     <artifactId>datainstiller</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
-    <name>classturbine</name>
+    <name>datainstiller</name>
     <url>https://code.google.com/p/datainstiller/</url>
     <licenses>
       <license>

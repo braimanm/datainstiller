@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
@@ -57,13 +58,13 @@ public class DataGenerator {
 	private FieldDataStore fieldDataStore;
 	private Map<String,Integer> classes;
 	private Map<String,GeneratorInterface> generatorStore;
-	private GenConverterLookup genConvertorLookup;
+	private XStream xstream;
 	
 	public DataGenerator() {
 		this(null);
 	}
 	
-	public DataGenerator(List<SingleValueConverter> singleValueConverters){
+	public DataGenerator(List<DataValueConverter> converters){
 		fieldDataStore = new FieldDataStore();
 		generatorStore = new HashMap<>();
 		registerGenerator("ADDRESS", new AddressGenerator());
@@ -74,10 +75,12 @@ public class DataGenerator {
 		registerGenerator("WORD",new WordGenerator());
 		registerGenerator("NUMBER",new NumberGenerator());
 		registerGenerator("FILE2LIST",new File2ListGenerator());
-		genConvertorLookup = new GenConverterLookup();
-        if (singleValueConverters!=null) {
-            for (SingleValueConverter converter : singleValueConverters){
-                genConvertorLookup.registerConverter(converter);
+		//genConvertorLookup = new GenConverterLookup();
+		xstream = new XStream();
+        if (converters!=null) {
+            for (Converter converter : converters){
+                //genConvertorLookup.registerConverter(converter);
+            	xstream.registerConverter(converter);
             }
         }
 	}
@@ -90,11 +93,11 @@ public class DataGenerator {
 		generatorStore.put(key, generator);
 	}
 		
-	private GenConverterLookup getConverterLookup(){
-	    //Flush the cache to get new instance of converter for each converter lookup
-	    genConvertorLookup.getConverterLookup().flushCache();
-	    return genConvertorLookup;
-	}
+//	private GenConverterLookup getConverterLookup(){
+//	    //Flush the cache to get new instance of converter for each converter lookup
+//	    genConvertorLookup.flushCache();
+//	    return genConvertorLookup;
+//	}
 		
 	public int getRecursionLevel() {
 		return recursionLevel;
@@ -248,7 +251,14 @@ public class DataGenerator {
 	private <T> T generate(Class<T> cls, Field ffield,boolean arrayOrColection) {
 		processAnnotations(cls);
 
-		Converter conv = getConverterLookup().getConverterLookup().lookupConverterForType(cls);
+		//Converter conv = getConverterLookup().lookupConverterForType(cls);
+		Converter conv = xstream.getConverterLookup().lookupConverterForType(cls);
+		
+		if (conv instanceof DataValueConverter) {
+			String stringValue = generateValueForField(cls,ffield);
+			Object value = ((DataValueConverter) conv).fromString(stringValue,cls);
+			return (T) value;
+		}
 		
 		if (conv instanceof SingleValueConverter){
 			String stringValue = generateValueForField(cls,ffield);
@@ -349,7 +359,8 @@ public class DataGenerator {
 		    	classes.put(key, i);
 		    }
 			
-			Object obj = getConverterLookup().getReflectionProvider().newInstance(cls);
+			//Object obj = getConverterLookup().getReflectionProvider().newInstance(cls);
+			Object obj = xstream.getReflectionProvider().newInstance(cls);
 			for (Field field : cls.getDeclaredFields()){
 				if (isInnerClass(field.getType())){
 					System.err.println("          Field '" + field.getName() +"' was skipped by generator." );
@@ -384,7 +395,7 @@ public class DataGenerator {
 			return null;
 		}
 		
-		System.err.println("[WARNING] No generator was found for " + conv);
+		System.err.println("[WARNING] Converter type: " + conv.getClass().getName() + ". Can't generate data for field " + ffield);
 		return null;
 	}
 	
