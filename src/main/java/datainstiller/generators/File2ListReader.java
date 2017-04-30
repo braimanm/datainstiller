@@ -24,21 +24,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class File2ListReader {
-	
-	public List<String> populate(String fileName){
-		List<String> listToPopulate=new ArrayList<String>();
-		InputStream inStream=this.getClass().getResourceAsStream(fileName);
-		if (inStream==null) 
+
+	public List<String> populate(String fileName) {
+		List<String> listToPopulate = new ArrayList<String>();
+		InputStream inStream = this.getClass().getResourceAsStream(fileName);
+		if (inStream == null)
 			throw new RuntimeException("Resource file: " + fileName + " was not found!");
-		BufferedReader reader=new BufferedReader(new InputStreamReader(inStream),100000);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inStream), 100000);
 		String line;
 		try {
-			while((line=reader.readLine()) !=null) listToPopulate.add(line);
+			while ((line = reader.readLine()) != null) listToPopulate.add(line);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (reader!= null) reader.close();
+				if (reader != null) reader.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

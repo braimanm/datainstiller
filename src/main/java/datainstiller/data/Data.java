@@ -36,7 +36,6 @@ public @interface Data {
 	String pattern() default "";
 	String alias() default "";
 	int nArray() default 3;
-	int nRecursion() default 1;
 	Class<?>[] clasz() default void.class;
 	Class<?> fieldClass() default void.class;
 	String fieldName() default "";

@@ -25,19 +25,19 @@ public class File2ListGenerator extends File2ListReader implements GeneratorInte
 	}
 	
 	public File2ListGenerator(String fileName){
-		list=populate("/" + fileName);
+		list = populate("/" + fileName);
 	}
-	
-	public String getValue(){
-		if (list.size()==0) 
+
+	public String getValue() {
+		if (list.size() == 0)
 			throw new RuntimeException("The file is empty!");
-		int index=(int) (Math.random()*list.size());
+		int index = (int) (Math.random() * list.size());
 		return list.get(index);
 	}
 
 	@Override
 	public String generate(String pattern, String value) {
-		list=populate("/" + value);
+		list = populate("/" + value);
 		return getValue();
 	}
 	

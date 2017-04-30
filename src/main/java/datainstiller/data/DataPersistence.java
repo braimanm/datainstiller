@@ -16,19 +16,15 @@ Copyright 2010-2012 Michael Braiman
 
 package datainstiller.data;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.net.URL;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.extended.ISO8601GregorianCalendarConverter;
+import org.testng.annotations.Test;
+
+import java.io.*;
+import java.net.URL;
 
 /**
  * @author Michael Braiman braimanm@gmail.com
@@ -50,13 +46,13 @@ public abstract class DataPersistence {
 	protected String schemaLocation;
 	@Data(skip=true)
 	private DataAliases aliases;
+
+	protected DataPersistence() {
+	}
 	
 	public DataAliases getDataAliases(){
 		return aliases;
 	}
-	
-	 protected DataPersistence(){
-	 }
 	
 	 protected XStream getXstream(){
 		XStream xstream = new XStream();
@@ -80,7 +76,7 @@ public abstract class DataPersistence {
 	/**
 	 * This method deserialize given XML string to the object 	
 	 * @param xml XML string which represents deserialized object
-	 * @param forClass class to deserialize 
+	 * @param resolveAliases resolve aliases during serialization
 	 * @return deserialized object
 	 */
 	@SuppressWarnings("unchecked")
@@ -99,7 +95,7 @@ public abstract class DataPersistence {
 	/**
 	 * This method deserialize file represented by URL to the object
 	 * @param url URL pointer to the file to be deserialized
-	 * @param forClass class to deserialize
+	 * @param resolveAliases resolve aliases during serialization
 	 * @return deserialized object
 	 */
 	@SuppressWarnings("unchecked")
@@ -118,7 +114,7 @@ public abstract class DataPersistence {
 	/**
 	 * This method deserialize {@link InputStream} to the object
 	 * @param inputStream input stream to deserialize from
-	 * @param forClass class to deserialize
+	 * @param resolveAliases resolve aliases during serialization
 	 * @return deserialized object
 	 */
 	
@@ -137,8 +133,8 @@ public abstract class DataPersistence {
 	
 	/**
 	 * This method deserialize given resource file to the object 
-	 * @param resourceFile resource file to deserialize from
-	 * @param forClass class to deserialize
+	 * @param resourceFilePath path of resource file to deserialize from
+	 * @param resolveAliases resolve aliases during serialization
 	 * @return deserialized object
 	 */
 	public  <T extends DataPersistence> T fromResource(String resourceFilePath, boolean resolveAliases){
@@ -160,7 +156,7 @@ public abstract class DataPersistence {
 	/**
 	 * This method deserialize given file to the object 
 	 * @param filePath file path to deserialize from
-	 * @param forClass class to deserialize
+	 * @param resolveAliases resolve aliases during serialization
 	 * @return deserialized object
 	 */
 	@SuppressWarnings("unchecked")
@@ -187,7 +183,7 @@ public abstract class DataPersistence {
 	public String toXML(){
 		String header="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n";
 		XStream xstream=getXstream();
-		String xml=xstream.toXML(this);
+		String xml = xstream.toXML(this).replaceAll(" xmlns=.*", ">"); // Remove xml namespaces;
 		return header + xml;
 	}
 	
@@ -235,6 +231,12 @@ public abstract class DataPersistence {
 	public String generateXML(){
 		DataPersistence obj = new DataGenerator().generate(this.getClass());
 		return obj.toXML();
+	}
+
+	//Allows to generate data using IDE
+	@Test
+	public void generate() {
+		System.out.println(generateXML());
 	}
 	
 }

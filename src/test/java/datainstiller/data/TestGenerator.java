@@ -1,17 +1,13 @@
 package datainstiller.data;
 
-import java.util.List;
-import java.util.Set;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import datainstiller.data.Data2.Data3;
+import datainstiller.data.Data2.Data4;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-
-import datainstiller.data.Data;
-import datainstiller.data.Data2.Data3;
-import datainstiller.data.Data2.Data4;
-import datainstiller.data.DataGenerator;
+import java.util.List;
+import java.util.Set;
 
 @XStreamAlias("data1")
 public class TestGenerator extends DataPersistence {
@@ -78,9 +74,9 @@ public class TestGenerator extends DataPersistence {
 		System.out.println(gen.getGenerator("ADDRESS").generate("{#} {S}, {T}, {O}, {K} ({P})",null));
 		System.out.println(gen.getGenerator("ALPHANUMERIC").generate("{A}{B}{C}{D}(a)(A)(a)",null));
 		System.out.println(gen.getGenerator("CUSTOM_LIST").generate(null, "aaa,bbb,ccc,ddd"));
-		System.out.println(gen.getGenerator("DATE").generate("2010/01/01|2013/12/31|yyyy/MM/dd","dd MMM yyyy"));
-		System.out.println(gen.getGenerator("HUMAN_NAMES").generate(null,"{M} and {F} {S}"));
-		System.out.println(gen.getGenerator("NUMBER").generate("-100,100", "##.000"));
+		System.out.println(gen.getGenerator("DATE").generate("dd MMM yyyy", "2010/01/01|2013/12/31|yyyy/MM/dd"));
+		System.out.println(gen.getGenerator("HUMAN_NAMES").generate("{M} and {F} {S}", null));
+		System.out.println(gen.getGenerator("NUMBER").generate("##.000", "-100,100"));
 		System.out.println(gen.getGenerator("WORD").generate("{a} {b}",null));
 
 	}

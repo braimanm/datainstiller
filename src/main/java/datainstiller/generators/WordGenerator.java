@@ -26,29 +26,29 @@ public class WordGenerator extends File2ListReader implements GeneratorInterface
 	
 	private void init() {
 		if (words == null){
-			words=populate("/words_en");
+			words = populate("/words_en");
 		}
 	}
 
-	private String getWord(int lettersCount,boolean fromStart,int letterCase){
+	private String getWord(int lettersCount, boolean fromStart, int letterCase) {
 		init();
-		int count=lettersCount;
-		int index=(int) (Math.random()*words.size());
-		String word=words.get(index).toLowerCase();
-		if (letterCase==1) {
+		int count = lettersCount;
+		int index = (int) (Math.random() * words.size());
+		String word = words.get(index).toLowerCase();
+		if (letterCase == 1) {
 			word=word.toUpperCase();
 		}
-		if (letterCase==3) {
+		if (letterCase == 3) {
 			word = word.substring(0,1).toUpperCase() + word.substring(1);
 		}
-		if (lettersCount==-1) return word;
-		if (lettersCount==0) count=(int) (Math.random()*10) + 1;
-		if (count>word.length()) return word;
-		if (fromStart){
-			String ret=word.substring(0,count);
+		if (lettersCount == -1) return word;
+		if (lettersCount == 0) count = (int) (Math.random() * 10) + 1;
+		if (count > word.length()) return word;
+		if (fromStart) {
+			String ret = word.substring(0, count);
 			return ret;
 		} else {
-			String ret=word.substring(word.length()-count);
+			String ret = word.substring(word.length() - count);
 			return ret;
 		}		
 	}
@@ -64,22 +64,22 @@ public class WordGenerator extends File2ListReader implements GeneratorInterface
 //	Ex: {A},{A} - 'SLEEP,SLEEP', {c:3}{c:3} - 'tortor', [B:2][B:2] - 'POPO'
 //	[A] and {A} are not replaced by the same word
 
-	public String generate(String pattern){
-		Pattern patt=Pattern.compile("[{|\\[][a-zA-Z](:\\d)*[|}\\]]");
-		Matcher matcher=patt.matcher(pattern);
-		String out=pattern;
-		while (matcher.find()){
+	public String generate(String pattern) {
+		Pattern patt = Pattern.compile("[{|\\[][a-zA-Z](:\\d)*[|}\\]]");
+		Matcher matcher = patt.matcher(pattern);
+		String out = pattern;
+		while (matcher.find()) {
 			int letterCase = 0;
-			int letterCount=-1;
-			char brkt=matcher.group().charAt(0);
-			char c=matcher.group().charAt(1);
-			if (brkt==123 && c>=65 && c<=90) letterCase = 1;
-			if (brkt==91) letterCase = (int) (Math.random()*3);
-			if (brkt==124) letterCase = 3;
-			if (matcher.end()-matcher.start()>3){
-				letterCount=matcher.group().charAt(3)-48;
+			int letterCount = -1;
+			char brkt = matcher.group().charAt(0);
+			char c = matcher.group().charAt(1);
+			if (brkt == 123 && c >= 65 && c <= 90) letterCase = 1;
+			if (brkt == 91) letterCase = (int) (Math.random() * 3);
+			if (brkt == 124) letterCase = 3;
+			if (matcher.end() - matcher.start() > 3) {
+				letterCount = matcher.group().charAt(3) - 48;
 			}
-			out=out.replace(matcher.group(),getWord(letterCount,true,letterCase));
+			out = out.replace(matcher.group(), getWord(letterCount, true, letterCase));
 		}
 		return out;
 	}

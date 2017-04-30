@@ -3,8 +3,8 @@
 <data1>
   <aliases>
   	<ALIAS>$[ALPHANUMERIC('([a][b][c]) [d][e][f]-[g][h][i][j]','null')]</ALIAS>
-    <ALIAS2>$[DATE('1945/01/01|1995/12/31|yyyy/MM/dd','dd MMM yyyy')]</ALIAS2>
-    <name>$[HUMAN_NAMES('null','{A} {S}')]</name>
+    <ALIAS2>$[DATE('dd MMM yyyy','1945/01/01|1995/12/31|yyyy/MM/dd')]</ALIAS2>
+    <name>$[HUMAN_NAMES('{A} {S}', 'null')]</name>
     <address></address>
   </aliases>
   <byte1>0</byte1>

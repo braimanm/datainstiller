@@ -26,25 +26,25 @@ public class NumberGenerator implements GeneratorInterface{
 	
 	public NumberGenerator() {
 	}
-	
-	public NumberGenerator(String min,String max,String format){
-		minNum=Long.parseLong(min);
-		maxNum=Long.parseLong(max);
-		this.format=format;
+
+	public NumberGenerator(String min, String max, String format) {
+		minNum = Long.parseLong(min);
+		maxNum = Long.parseLong(max);
+		this.format = format;
 	}
 	
 	public String getNum(){
-		double num=minNum + Math.random() * (maxNum-minNum);
-		DecimalFormat dec=new DecimalFormat(format);
+		double num = minNum + Math.random() * (maxNum - minNum);
+		DecimalFormat dec = new DecimalFormat(format);
 		return dec.format(num);
 	}
 
 	@Override
 	public String generate(String pattern, String value) {
-		String[] limits=pattern.split(",");
-		minNum=Long.parseLong(limits[0]);
-		maxNum=Long.parseLong(limits[1]);
-		format=value;
+		String[] limits = value.split(",");
+		minNum = Long.parseLong(limits[0]);
+		maxNum = Long.parseLong(limits[1]);
+		format = pattern;
 		return getNum();
 	}
 	

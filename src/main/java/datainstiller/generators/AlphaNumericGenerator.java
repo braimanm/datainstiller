@@ -22,14 +22,14 @@ import java.util.regex.Pattern;
 public class AlphaNumericGenerator implements GeneratorInterface{
 	
 	private String getLetter(boolean capital){
-		int offset=97;
-		if (capital) offset=65;
-		int i=(int) (Math.random()*26);
-		return String.valueOf((char) (offset+i));
+		int offset = 97;
+		if (capital) offset = 65;
+		int i = (int) (Math.random() * 26);
+		return String.valueOf((char) (offset + i));
 	}
 	
 	private String getDigit(){
-		int d=(int) (Math.random()*10);
+		int d = (int) (Math.random() * 10);
 		return String.valueOf(d);
 	}
 	
@@ -45,38 +45,38 @@ public class AlphaNumericGenerator implements GeneratorInterface{
 	 */
 	
 	public String generate(String pattern){
-		String out=pattern;
-		Pattern patt=Pattern.compile("[|\\[\\(\\{][a-zA-Z][|\\]\\)\\}]");
-		Matcher matcher=patt.matcher(pattern);
+		String out = pattern;
+		Pattern patt = Pattern.compile("[|\\[\\(\\{][a-zA-Z][|\\]\\)\\}]");
+		Matcher matcher = patt.matcher(pattern);
 
 		while (matcher.find()){
-			char bracket=matcher.group().charAt(0);
-			char c=matcher.group().charAt(1);
-			boolean upperCase=false;
-			String value=null;
-			upperCase=(c>=65 && c<=90);
-			if (bracket==40){
-				value=getLetter(upperCase);
-			} else if (bracket==91){
-				value=getDigit();
-			} else if (bracket==124){
-				int rnd=(int) (Math.random()*2);
-				if (rnd==0) {
+			char bracket = matcher.group().charAt(0);
+			char c = matcher.group().charAt(1);
+			boolean upperCase = false;
+			String value = null;
+			upperCase = (c >= 65 && c <= 90);
+			if (bracket == 40) {
+				value = getLetter(upperCase);
+			} else if (bracket == 91) {
+				value = getDigit();
+			} else if (bracket == 124) {
+				int rnd = (int) (Math.random() * 2);
+				if (rnd == 0) {
 					value=getLetter(upperCase);
-				}else if (rnd==1){
-					value=getDigit();
+				} else if (rnd == 1) {
+					value = getDigit();
 				}
-			} else if (bracket==123){
-				int rnd=(int) (Math.random()*3);
-				if (rnd==0) {
-					value=getLetter(true);
-				} else if (rnd==1){
-					value=getDigit();
+			} else if (bracket == 123) {
+				int rnd = (int) (Math.random() * 3);
+				if (rnd == 0) {
+					value = getLetter(true);
+				} else if (rnd == 1) {
+					value = getDigit();
 				} else {
-					value=getLetter(false);
+					value = getLetter(false);
 				}
 			}
-			out=out.replace(matcher.group(),value);
+			out = out.replace(matcher.group(), value);
 		}
 		return out;
 		

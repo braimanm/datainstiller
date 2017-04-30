@@ -17,5 +17,5 @@ Copyright 2010-2012 Michael Braiman
 package datainstiller.generators;
 
 public interface GeneratorInterface {
-	public String generate(String pattern,String value);
+	String generate(String pattern, String value);
 }

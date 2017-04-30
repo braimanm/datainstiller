@@ -37,7 +37,6 @@ public class FieldData {
 		pattern = data.pattern();
 		value = data.value();
 		nArray = data.nArray();
-		nRecursion = data.nRecursion();
 		skipField = data.skip();
 	}
 
@@ -47,7 +46,7 @@ public class FieldData {
 
 	public String resolveAlias() {
 		if (fieldDataStore!=null && alias!=null){
-			return (String) fieldDataStore.getAliases().get(alias);
+			return fieldDataStore.getAliases().get(alias);
 		}
 		return null;
 	}

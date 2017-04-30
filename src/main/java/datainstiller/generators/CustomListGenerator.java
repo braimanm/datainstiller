@@ -23,25 +23,25 @@ import java.util.List;
 public class CustomListGenerator implements GeneratorInterface{
 	private List<String> list;
 
-	CustomListGenerator(){	
+	CustomListGenerator() {
 	}
 	
 	public CustomListGenerator(List<String> list) {
-		this.list=list;
+		this.list = list;
 	}
 	
 	public CustomListGenerator(String... values){
-		list=Arrays.asList(values);
+		list = Arrays.asList(values);
 	}
 	
 	public String getValue(){
-		int index=(int) (Math.random()*list.size());
+		int index = (int) (Math.random() * list.size());
 		return list.get(index);
 	}
 	
 	@Override
 	public String generate(String pattern, String value) {
-		list= Arrays.asList(value.split(","));
+		list = Arrays.asList(value.split(","));
 		return getValue();
 	}
 	

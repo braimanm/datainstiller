@@ -25,28 +25,28 @@ public class HumanNameGenerator extends File2ListReader implements GeneratorInte
 	
 	
 	private void init() {
-		if (sureNames==null && femaleNames==null && maleNames==null){
-			sureNames=populate("/sure_names");
-			femaleNames=populate("/female_names");
-			maleNames=populate("/male_names");
+		if (sureNames == null && femaleNames == null && maleNames == null) {
+			sureNames = populate("/sure_names");
+			femaleNames = populate("/female_names");
+			maleNames = populate("/male_names");
 		}
 	}
 	
 	public String getFemaleFirstName() {
 		init();
-		int index=(int)(Math.random() * femaleNames.size());
+		int index = (int) (Math.random() * femaleNames.size());
 		return femaleNames.get(index);
 	}
 	
 	public String getMaleFirstName() {
 		init();
-		int index=(int)(Math.random() * maleNames.size());
+		int index = (int) (Math.random() * maleNames.size());
 		return maleNames.get(index);
 	}
 	
 	public String getAnyFirstName() {
-		int sex=(int)(Math.random() * 2);
-		if (sex==0) {
+		int sex = (int) (Math.random() * 2);
+		if (sex == 0) {
 			return getFemaleFirstName();
 		} else {
 			return getMaleFirstName();
@@ -55,7 +55,7 @@ public class HumanNameGenerator extends File2ListReader implements GeneratorInte
 	
 	public String getSureName() {
 		init();
-		int index=(int)(Math.random() * sureNames.size());
+		int index = (int) (Math.random() * sureNames.size());
 		return sureNames.get(index);
 	}
 	
@@ -66,25 +66,25 @@ public class HumanNameGenerator extends File2ListReader implements GeneratorInte
 	 *{S} - Sure Name
 	*/
 	public String getFullName(String format) {
-		String fullName=format;
-		if (format.contains("{F}")){
-			fullName=fullName.replace("{F}", getFemaleFirstName());
+		String fullName = format;
+		if (format.contains("{F}")) {
+			fullName = fullName.replace("{F}", getFemaleFirstName());
 		}
 		if (format.contains("{M}")) {
-			fullName=fullName.replace("{M}", getMaleFirstName());
+			fullName = fullName.replace("{M}", getMaleFirstName());
 		}
 		if (format.contains("{A}")){
-			fullName=fullName.replace("{A}", getAnyFirstName());
+			fullName = fullName.replace("{A}", getAnyFirstName());
 		}
 		if (format.contains("{S}")){
-			fullName=fullName.replace("{S}", getSureName());
+			fullName = fullName.replace("{S}", getSureName());
 		}
 		return fullName;
 	}
 
 	@Override
 	public String generate(String pattern, String value) {
-		return getFullName(value);
+		return getFullName(pattern);
 	}
 	
 //	@Test

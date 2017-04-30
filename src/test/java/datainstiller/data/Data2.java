@@ -1,8 +1,5 @@
 package datainstiller.data;
 
-import datainstiller.data.Data;
-import datainstiller.data.DataPersistence;
-
 public class Data2 extends DataPersistence {
 	byte byte1;
 	Byte byte2;
@@ -22,13 +19,12 @@ public class Data2 extends DataPersistence {
 	Character char2;
 	@Data(value = "value2", alias = "ALIAS2")
 	String string;
-	
-	
-	public class Data3 extends DataPersistence {
+
+	public static class Data4 extends DataPersistence {
 		String string;
 	}
-	
-	public static class Data4 extends DataPersistence {
+
+	public class Data3 extends DataPersistence {
 		String string;
 	}
 	

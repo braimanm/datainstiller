@@ -28,16 +28,16 @@ public class DateGenerator implements GeneratorInterface {
 	
 	public DateGenerator(){
 	}
-	
-	public DateGenerator(String from,String to,String pattern) throws ParseException {
-		dateFormater=new SimpleDateFormat(pattern);
+
+	public DateGenerator(String from, String to, String pattern) throws ParseException {
+		dateFormater = new SimpleDateFormat(pattern);
 		dateFormater.setTimeZone(TimeZone.getTimeZone("GMT"));
-		dateFrom=dateFormater.parse(from).getTime();
-		dateTo=dateFormater.parse(to).getTime()+24*60*60*1000+1;
+		dateFrom = dateFormater.parse(from).getTime();
+		dateTo = dateFormater.parse(to).getTime() + 24 * 60 * 60 * 1000 + 1;
 	}
 	
 	private long getRandomDate(){
-		return dateFrom + (long)(Math.random()*(dateTo-dateFrom));
+		return dateFrom + (long) (Math.random() * (dateTo - dateFrom));
 	}
 	
 	public String getDate(){
@@ -45,20 +45,20 @@ public class DateGenerator implements GeneratorInterface {
 	}
 	
 	public String getDate(String format){
-		DateFormat formater=new SimpleDateFormat(format);
+		DateFormat formater = new SimpleDateFormat(format);
 		formater.setTimeZone(TimeZone.getTimeZone("GMT"));
 		return formater.format(getRandomDate());
 	}
 
 	@Override
 	public String generate(String pattern, String value) {
-		String[] args=pattern.split("\\|");
+		String[] args = value.split("\\|");
 		try {
-			DateGenerator dg=new DateGenerator(args[0],args[1],args[2]);
-			if (value==null || value.isEmpty()){
+			DateGenerator dg = new DateGenerator(args[0], args[1], args[2]);
+			if (pattern == null || pattern.isEmpty()) {
 				return dg.getDate();
 			} else {
-				return dg.getDate(value);
+				return dg.getDate(pattern);
 			}
 		} catch (ParseException e) {
 			throw new RuntimeException(e);
@@ -67,11 +67,11 @@ public class DateGenerator implements GeneratorInterface {
 	
 	
 //	@Test
-//	public static void test() throws ParseException{
+//	void test() throws ParseException{
 //		DateGenerator generator=new DateGenerator("1920/01/01","2000/12/31","yyyy/MM/dd");
 //		System.out.println(generator.getDate());
 //		System.out.println(generator.getDate("dd MMM yyyy"));
 //		System.out.println(generator.getDate("MMMM dd yyyy hh:mm:ss"));
-//		System.out.println(generator.generate("2010/01/01|2013/12/31|yyyy/MM/dd","dd MMM yyyy"));
+//		System.out.println(new DateGenerator().generate("dd MMM yyyy","2010/01/01|2013/12/31|yyyy/MM/dd"));
 //	}
 }
