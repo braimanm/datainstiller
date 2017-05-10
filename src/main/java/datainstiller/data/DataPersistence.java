@@ -33,16 +33,17 @@ import java.net.URL;
  * All the class members which are not annotated with {@link XStreamOmitField} are serialized and deserialized to and from various formats 
  */
 public abstract class DataPersistence {
-	@XStreamAlias("xmlns")
-	@XStreamAsAttribute
-	protected String xmlns;
-	
-	@XStreamAlias("xmlns:xsi")
-	@XStreamAsAttribute
+    @Data(skip = true)
+    @XStreamAlias("xmlns")
+    @XStreamAsAttribute
+    protected String xmlns;
+    @Data(skip = true)
+    @XStreamAlias("xmlns:xsi")
+    @XStreamAsAttribute
 	protected String xsi;
-	
-	@XStreamAlias("xsi:schemaLocation")
-	@XStreamAsAttribute
+    @Data(skip = true)
+    @XStreamAlias("xsi:schemaLocation")
+    @XStreamAsAttribute
 	protected String schemaLocation;
 	@Data(skip=true)
 	private DataAliases aliases;

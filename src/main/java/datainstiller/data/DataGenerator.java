@@ -16,20 +16,6 @@ Copyright 2010-2012 Michael Braiman
 
 package datainstiller.data;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.Converter;
@@ -41,16 +27,14 @@ import com.thoughtworks.xstream.converters.enums.EnumConverter;
 import com.thoughtworks.xstream.converters.enums.EnumSetConverter;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
 import com.thoughtworks.xstream.core.util.Primitives;
+import datainstiller.generators.*;
 
-import datainstiller.generators.AddressGenerator;
-import datainstiller.generators.AlphaNumericGenerator;
-import datainstiller.generators.CustomListGenerator;
-import datainstiller.generators.DateGenerator;
-import datainstiller.generators.File2ListGenerator;
-import datainstiller.generators.GeneratorInterface;
-import datainstiller.generators.HumanNameGenerator;
-import datainstiller.generators.NumberGenerator;
-import datainstiller.generators.WordGenerator;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class DataGenerator {
 	private int nArray = 3;
@@ -102,17 +86,17 @@ public class DataGenerator {
 	private String getGeneratedValue(FieldData fieldData){
 		String value = fieldData.value();
 		String alias = fieldData.alias();
-		String aliasValue = (alias!=null) ? (String) fieldDataStore.getAliases().get(alias) : null;
-		
-		if (aliasValue!=null){
-			return "${" + alias + "}";
-		}
-		
-		if (fieldData.generatorType()!=null){
-			GeneratorInterface generator = generatorStore.get(fieldData.generatorType());
-			if (generator!=null){
-				value = generator.generate(fieldData.pattern() ,fieldData.value());
-			} else {
+        String aliasValue = (alias != null) ? fieldDataStore.getAliases().get(alias) : null;
+
+        if (aliasValue != null) {
+            return "${" + alias + "}";
+        }
+
+        if (fieldData.generatorType() != null) {
+            GeneratorInterface generator = generatorStore.get(fieldData.generatorType());
+            if (generator != null) {
+                value = generator.generate(fieldData.pattern(), fieldData.value());
+            } else {
 				throw new GeneratorNotFoundException("Generator " + fieldData.generatorType() + " was not found!");
 			}
 		}
@@ -124,32 +108,32 @@ public class DataGenerator {
 		
 		return value;
 	}
-	
-	private String generateValueForField(Class<?> cls,Field field){
-		String returnValue=null;
-		FieldData fieldData = fieldDataStore.getData(field);
-		if (fieldData!=null){
-			returnValue = getGeneratedValue(fieldData);
-		}
+
+    private String generateValueForField(Class<?> cls, Field field) {
+        String returnValue = null;
+        FieldData fieldData = fieldDataStore.getData(field);
+        if (fieldData != null) {
+            returnValue = getGeneratedValue(fieldData);
+        }
 		if(cls.isArray()){
 			cls = cls.getComponentType();
 		}
 		if (cls.isPrimitive() || Primitives.unbox(cls)!=null || cls.isEnum()) {
-			if (returnValue==null || returnValue.isEmpty()){
-				return "0";
-			};
-			if (returnValue.startsWith("${")) {
-				return fieldData.resolveAlias();
+            if (returnValue == null || returnValue.isEmpty()) {
+                return "0";
+            }
+            if (returnValue.startsWith("${")) {
+                return fieldData.resolveAlias();
 			}
 		} 
 		if (cls.equals(Date.class)){
 			String defaultPattern = "yyyy-MM-dd HH:mm:ss.S z";
 			return new SimpleDateFormat(defaultPattern).format(new Date());
 		}
-		
-		if (returnValue==null){
-				return field.getName();
-		}
+
+        if (returnValue == null) {
+            return field.getName();
+        }
 			
 		return returnValue;
 	}
@@ -164,12 +148,12 @@ public class DataGenerator {
 	
 	private void processAnnotations(Class<?> clasz){
 		MetaData metaData = clasz.getAnnotation(MetaData.class);
-		if (metaData!=null){
-			for (Data data: metaData.value()){
-				Class<?> cls = clasz;
-				if (data.fieldClass()!=void.class){
-					cls = data.fieldClass();
-				}
+        if (metaData != null) {
+            for (Data data : metaData.value()) {
+                Class<?> cls = clasz;
+                if (data.fieldClass() != void.class) {
+                    cls = data.fieldClass();
+                }
 				if (data.fieldName().trim().isEmpty()){
 					throw new AnnotationProcessingException("Field 'fieldName' must be provided in MetaData annotation" + data);
 				}
@@ -180,18 +164,18 @@ public class DataGenerator {
 		do {
 			for (Field field : superClasz.getDeclaredFields()){
 				Data data = field.getAnnotation(Data.class);
-				if (data==null){
-					continue;
-				}
+                if (data == null) {
+                    continue;
+                }
 				if (!fieldDataStore.containsKey(field)){
 				    fieldDataStore.setData(field, new FieldData(data));
 				}
 			}
 			superClasz = superClasz.getSuperclass();
-		} while (superClasz!=null);
-	}
-	
-	@SuppressWarnings("restriction")
+        } while (superClasz != null);
+    }
+
+    @SuppressWarnings("restriction")
 	private Class<?> getGenericTypeOrString(Field field,int argumentNum){
 		Type type = field.getGenericType();
 		if (type!=null && type instanceof sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl){
@@ -295,9 +279,9 @@ public class DataGenerator {
 		} 
 		
 		if (conv instanceof CollectionConverter){
-			Collection collection = null;
-			try {
-				collection = (Collection) cls.newInstance();
+            Collection collection;
+            try {
+                collection = (Collection) cls.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
@@ -358,15 +342,15 @@ public class DataGenerator {
 			Class superCls = cls;
 			do {	
 				for (Field field : superCls.getDeclaredFields()){
-					if (isInnerClass(field.getType())){
-						System.err.println("          Field '" + field.getName() +"' was skipped by generator." );
-						continue;
+                    if (isInnerClass(field.getType())) {
+                        System.err.println("          Field '" + field.getName() + "' was skipped by generator.");
+                        continue;
 					}
 					field.setAccessible(true);
 					FieldData fieldData = fieldDataStore.getData(field);
-					if (fieldData!=null && fieldData.skip()){ 
-						continue;
-					}
+                    if (fieldData != null && fieldData.skip()) {
+                        continue;
+                    }
 					if (field.isAnnotationPresent(XStreamOmitField.class)){
 						continue;
 					}
@@ -377,11 +361,9 @@ public class DataGenerator {
 					Object value = generate(field.getType(),field,false);
 					try {
 						field.set(obj, value);
-					} catch (IllegalArgumentException | IllegalAccessException e) {
-						throw new RuntimeException(e);
-					}  catch (NullPointerException e){
-						throw new RuntimeException(e);
-					}
+                    } catch (IllegalArgumentException | IllegalAccessException | NullPointerException e) {
+                        throw new RuntimeException(e);
+                    }
 				}
 				superCls = superCls.getSuperclass();
 			} while (superCls!=null);
