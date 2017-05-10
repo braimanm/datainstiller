@@ -16,22 +16,20 @@ Copyright 2010-2012 Michael Braiman
 
 package datainstiller.data;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-
 import datainstiller.generators.GeneratorInterface;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 
  * @author Michael Braiman braimanm@gmail.com
- *          <p/>
  *          This is{@link XStream} Converter implementation for marshaling and unmarshaling {@link DataAliases} map.
  *          During unmarshaling, if alias value is data generator expression then this expression is resolved to data using specific generator. 
  */
