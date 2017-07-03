@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<datainstiller.data.Pers1>
+    <aliases>
+        <address>${AddressGen.generateAddress()}</address>
+        <address-full>${address.toString("{C}, {#} {S}, {T}, {P}, {K}, {O}")}</address-full>
+        <country>${address.toString("{C}")}</country>
+        <street-number>${address.toString("{#}")}</street-number>
+        <street-name>${address.toString("{S}")}</street-name>
+        <city>${address.toString("{T}")}</city>
+        <province-name>${address.toString("{P}")}</province-name>
+        <province-code>${address.toString("{K}")}</province-code>
+        <postal-code>${address.toString("{O}")}</postal-code>
+        <now_plus_1Hour>${now.plusHours(1)}</now_plus_1Hour>
+        <string1>${now.format(DateTimeFormatter.ofPattern('h:m'))}</string1>
+        <string2>${now_plus_1Hour.format(DateTimeFormatter.ofPattern('hh:mm'))}</string2>
+        <name>${HumanNameGen.generate("{F} {S}", null)}</name>
+    </aliases>
+    <s1>${string1}</s1>
+    <s2>${address-full}</s2>
+    <pers2>
+        <s1>${name}</s1>
+        <s2>${string2}</s2>
+        <country>${country}</country>
+        <streetNumber>${street-number}</streetNumber>
+        <streetName>${street-name}</streetName>
+        <city>${city}</city>
+        <provinceName>${province-name}</provinceName>
+        <provinceCode>${province-code}</provinceCode>
+        <postalCode>${postal-code}</postalCode>
+    </pers2>
+</datainstiller.data.Pers1>

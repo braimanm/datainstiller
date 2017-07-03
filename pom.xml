@@ -4,7 +4,7 @@
 
     <groupId>com.googlecode.datainstiller</groupId>
     <artifactId>datainstiller</artifactId>
-    <version>1.0.3</version>
+	<version>1.0.4</version>
     <packaging>jar</packaging>
     <name>datainstiller</name>
     <url>https://code.google.com/p/datainstiller/</url>
@@ -88,6 +88,11 @@
   		<artifactId>joda-time</artifactId>
   		<version>2.7</version>
   	</dependency>
+	  <dependency>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-jexl3</artifactId>
+		  <version>3.1</version>
+	  </dependency>
   </dependencies>
   
   <distributionManagement>

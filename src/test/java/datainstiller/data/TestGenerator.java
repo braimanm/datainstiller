@@ -81,4 +81,10 @@ public class TestGenerator extends DataPersistence {
 
 	}
 
+	@Test
+	public void testJexl() {
+		Pers1 pers1 = new Pers1().fromResource("pers1.xml", true);
+		System.out.println(pers1.toXML());
+	}
+
 }

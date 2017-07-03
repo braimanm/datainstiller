@@ -23,6 +23,7 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import datainstiller.generators.GeneratorInterface;
+import org.apache.commons.jexl3.JxltEngine;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,13 +59,14 @@ public class DataAliasesConverter implements Converter {
 		DataAliases aliases = new DataAliases();
 		String nodeName;
 		String value;
-		while (reader.hasMoreChildren()) {
+        Object objValue = null;
+        while (reader.hasMoreChildren()) {
 			reader.moveDown();
 			nodeName = reader.getNodeName();
 			value = reader.getValue();
-			if (value.matches("\\$\\[.+\\]")) {
-				Pattern pattern = Pattern.compile("\\$\\[(.+)\\(\\s*'\\s*(.*)\\s*'\\s*\\,\\s*'\\s*(.*)\\s*'\\s*\\)");
-				Matcher matcher = pattern.matcher(value);
+            if (value.matches("\\$\\[.+]")) {
+                Pattern pattern = Pattern.compile("\\$\\[(.+)\\(\\s*'\\s*(.*)\\s*'\\s*,\\s*'\\s*(.*)\\s*'\\s*\\)");
+                Matcher matcher = pattern.matcher(value);
 				if (matcher.find() != true) {
 					throw new PatternUnmarshalException(value + " - invalid data generation expression!");
 				}	
@@ -72,9 +74,23 @@ public class DataAliasesConverter implements Converter {
 				String init = matcher.group(2);
 				String val = matcher.group(3);
 				value = genType.generate(init, val);
-			}
-			aliases.put(nodeName, value);
-			reader.moveUp();
+            } else {
+                JxltEngine.Expression expr = DataPersistence.jxlt.createExpression(value);
+                try {
+                    objValue = expr.evaluate(DataPersistence.jexlContext);
+                    value = objValue.toString();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            aliases.put(nodeName, value);
+            if (objValue != null) {
+                DataPersistence.jexlContext.set(nodeName, objValue);
+            } else {
+                DataPersistence.jexlContext.set(nodeName, value);
+            }
+            objValue = null;
+            reader.moveUp();
 		}
 		return aliases;
 	}

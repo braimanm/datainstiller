@@ -68,12 +68,12 @@ public class AddressGenerator extends File2ListReader implements GeneratorInterf
 
 		@Override
 		public String toString(){
-			String str = "Country: " + country + "\n";
-			str += "Street #: " + streetNumber + "\n";
-			str += "Street Name: " + streetName + "\n";
-			str += "City: " + city + "\n";
-			str += "Province Name: " + provinceName + "\n";
-			str += "Province Code: " + provinceCode + "\n";
+			String str = "Country: " + country + ", ";
+			str += "Street #: " + streetNumber + ", ";
+			str += "Street Name: " + streetName + ", ";
+			str += "City: " + city + ", ";
+			str += "Province Name: " + provinceName + ", ";
+			str += "Province Code: " + provinceCode + ", ";
 			str += "Postal Code: " + postalCode;
 			return str;
 		}
