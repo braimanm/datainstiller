@@ -41,9 +41,7 @@ import java.time.format.DateTimeFormatter;
  */
 public abstract class DataPersistence {
 	@Data(skip = true)
-	static final JxltEngine jxlt = new JexlBuilder().cache(512).strict(true).silent(false).create().createJxltEngine();
-	@Data(skip = true)
-	static final JexlContext jexlContext = new MapContext();
+	private JexlContext jexlContext;
 	@Data(skip = true)
     @XStreamAlias("xmlns")
     @XStreamAsAttribute
@@ -66,26 +64,34 @@ public abstract class DataPersistence {
 		return aliases;
 	}
 
-	protected XStream getXstream() {
+
+    protected XStream getXstream() {
 		XStream xstream = new XStream();
+		xstream.registerConverter(new DataAliasesConverter(jexlContext));
 		xstream.registerConverter(new ISO8601GregorianCalendarConverter());
 		xstream.processAnnotations(this.getClass());
 		return xstream;
 	}
 
+
 	private void initJexlContext() {
-		jexlContext.set("AddressGen", new AddressGenerator());
-		jexlContext.set("AlphaNumericGen", new AlphaNumericGenerator());
-		jexlContext.set("ListGen", new CustomListGenerator());
-		jexlContext.set("DateGen", new DateGenerator());
-		jexlContext.set("HumanNameGen", new HumanNameGenerator());
-		jexlContext.set("NumberGen", new NumberGenerator());
-		jexlContext.set("WordGen", new WordGenerator());
-		jexlContext.set("File2ListGen", new File2ListGenerator());
+	    if(jexlContext != null) {
+	        System.out.println("WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        }
+	    JexlContext jContext = new MapContext();
+		jContext.set("AddressGen", new AddressGenerator());
+		jContext.set("AlphaNumericGen", new AlphaNumericGenerator());
+		jContext.set("ListGen", new CustomListGenerator());
+		jContext.set("DateGen", new DateGenerator());
+		jContext.set("HumanNameGen", new HumanNameGenerator());
+		jContext.set("NumberGen", new NumberGenerator());
+		jContext.set("WordGen", new WordGenerator());
+		jContext.set("File2ListGen", new File2ListGenerator());
 		LocalDateTime now = LocalDateTime.now();
-		jexlContext.set("now", now);
-		jexlContext.set("DateTimeFormatter", DateTimeFormatter.BASIC_ISO_DATE);
-		initJexlContext(jexlContext);
+		jContext.set("now", now);
+		jContext.set("DateTimeFormatter", DateTimeFormatter.BASIC_ISO_DATE);
+		initJexlContext(jContext);
+		jexlContext = jContext;
 	}
 
 	protected void initJexlContext(JexlContext jexlContext) {

@@ -23,7 +23,10 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import datainstiller.generators.GeneratorInterface;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JxltEngine;
+import org.apache.commons.jexl3.MapContext;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,8 +38,17 @@ import java.util.regex.Pattern;
  *          During unmarshaling, if alias value is data generator expression then this expression is resolved to data using specific generator. 
  */
 public class DataAliasesConverter implements Converter {
+    private JexlContext jexlContext;
 
-	@SuppressWarnings("rawtypes")
+    public DataAliasesConverter(JexlContext jexlContext) {
+        if (jexlContext == null) {
+            this.jexlContext = new MapContext();
+        } else {
+            this.jexlContext = jexlContext;
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
 	@Override
 	public boolean canConvert(Class type) {
 		return (type.equals(DataAliases.class));
@@ -60,6 +72,7 @@ public class DataAliasesConverter implements Converter {
 		String nodeName;
 		String value;
         Object objValue = null;
+        JxltEngine jxlt = new JexlBuilder().strict(true).silent(false).create().createJxltEngine();
         while (reader.hasMoreChildren()) {
 			reader.moveDown();
 			nodeName = reader.getNodeName();
@@ -75,9 +88,9 @@ public class DataAliasesConverter implements Converter {
 				String val = matcher.group(3);
 				value = genType.generate(init, val);
             } else {
-                JxltEngine.Expression expr = DataPersistence.jxlt.createExpression(value);
+                JxltEngine.Expression expr = jxlt.createExpression(value);
                 try {
-                    objValue = expr.evaluate(DataPersistence.jexlContext);
+                    objValue = expr.evaluate(jexlContext);
                     value = objValue.toString();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -85,9 +98,9 @@ public class DataAliasesConverter implements Converter {
             }
             aliases.put(nodeName, value);
             if (objValue != null) {
-                DataPersistence.jexlContext.set(nodeName, objValue);
+                jexlContext.set(nodeName, objValue);
             } else {
-                DataPersistence.jexlContext.set(nodeName, value);
+                jexlContext.set(nodeName, value);
             }
             objValue = null;
             reader.moveUp();

@@ -16,7 +16,6 @@ Copyright 2010-2012 Michael Braiman
 
 package datainstiller.data;
 
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import java.util.Collection;
@@ -29,12 +28,10 @@ import java.util.Set;
  * 			This class represents aliases store. The only reason to have this class is for serialization and deserialization
  * 			of aliases by special XStream converter {@link DataAliasesConverter}. This class implements Map interface.    
  */
-@XStreamConverter(DataAliasesConverter.class)
 public class DataAliases implements Map<String, String> {
 	@XStreamOmitField
 	Map<String, String> map;
 
-	
 	public DataAliases() {
 		map = new HashMap<>();
 	}
