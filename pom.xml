@@ -4,7 +4,7 @@
 
     <groupId>com.googlecode.datainstiller</groupId>
     <artifactId>datainstiller</artifactId>
-	<version>1.0.5</version>
+	<version>1.1.0</version>
     <packaging>jar</packaging>
     <name>datainstiller</name>
     <url>https://code.google.com/p/datainstiller/</url>
@@ -29,7 +29,11 @@
       <email>braimanm@gmail.com</email>
     </developer>
   </developers>
-	
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
   <build>
   	<plugins>
   		<plugin>

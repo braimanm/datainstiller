@@ -43,12 +43,13 @@ public class DataGenerator {
 	private Map<String,Integer> classes;
 	private Map<String,GeneratorInterface> generatorStore;
 	private XStream xstream;
-	
-	public DataGenerator() {
-		this(null);
+
+	public DataGenerator(XStream xstream) {
+		this(xstream, null);
 	}
 	
-	public DataGenerator(List<DataValueConverter> converters){
+	public DataGenerator(XStream xstream, List<DataValueConverter> converters){
+		this.xstream = xstream;
 		fieldDataStore = new FieldDataStore();
 		generatorStore = new HashMap<>();
 		registerGenerator("ADDRESS", new AddressGenerator());
@@ -59,7 +60,6 @@ public class DataGenerator {
 		registerGenerator("WORD",new WordGenerator());
 		registerGenerator("NUMBER",new NumberGenerator());
 		registerGenerator("FILE2LIST",new File2ListGenerator());
-		xstream = new XStream();
         if (converters!=null) {
             for (Converter converter : converters){
             	xstream.registerConverter(converter);
@@ -120,7 +120,11 @@ public class DataGenerator {
 		}
 		if (cls.isPrimitive() || Primitives.unbox(cls)!=null || cls.isEnum()) {
             if (returnValue == null || returnValue.isEmpty()) {
-                return "0";
+            	if (cls.equals(char.class)) {
+            		return "";
+				} else {
+					return "0";
+				}
             }
             if (returnValue.startsWith("${")) {
                 return fieldData.resolveAlias();
@@ -235,7 +239,7 @@ public class DataGenerator {
 		
 		if (conv instanceof DataValueConverter) {
 			String stringValue = generateValueForField(cls,ffield);
-			Object value = ((DataValueConverter) conv).fromString(stringValue,cls);
+			Object value = ((DataValueConverter) conv).fromString(stringValue, cls, ffield);
 			return (T) value;
 		}
 		

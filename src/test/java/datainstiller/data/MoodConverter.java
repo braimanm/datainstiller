@@ -5,6 +5,8 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
+import java.lang.reflect.Field;
+
 public class MoodConverter implements DataValueConverter {
 
 	@SuppressWarnings("rawtypes")
@@ -41,7 +43,7 @@ public class MoodConverter implements DataValueConverter {
 	
 
 	@Override
-	public <T> T fromString(String str, Class<T> cls) {
+	public <T> T fromString(String str, Class<T> cls, Field field) {
 		T obj =null;
 		try {
 			obj = cls.newInstance();

@@ -29,9 +29,12 @@ import org.apache.commons.jexl3.MapContext;
 import org.testng.annotations.Test;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Michael Braiman braimanm@gmail.com
@@ -108,7 +111,31 @@ public abstract class DataPersistence {
 		}
 		return getXstream().fromXML(xml);
 	}
-	
+
+	private <T extends DataPersistence> T retainFields(T target) {
+		Class cls = this.getClass();
+		do {
+			for (Field field : cls.getDeclaredFields()) {
+				field.setAccessible(true);
+				if (!field.isAnnotationPresent(XStreamOmitField.class) ||
+						(field.isAnnotationPresent(Data.class) && field.getAnnotation(Data.class).skip() == false)) {
+					Object value = null;
+					try {
+						value = field.get(this);
+						if (value != null) {
+							field.set(target, value);
+						}
+					} catch (IllegalAccessException ignore) {
+						ignore.printStackTrace();
+					}
+				}
+			}
+
+			cls = cls.getSuperclass();
+		} while (!cls.equals(DataPersistence.class));
+		return target;
+	}
+
 	/**
 	 * This method deserialize given XML string to the object 	
 	 * @param xml XML string which represents deserialized object
@@ -122,7 +149,7 @@ public abstract class DataPersistence {
 		if (resolveAliases) {
 			data = (T) resolveAliases(data);
 		}
-		return data;
+		return retainFields(data);
 	}
 	
 	public  <T extends DataPersistence> T fromXml(String xml) {
@@ -142,7 +169,7 @@ public abstract class DataPersistence {
 		if (resolveAliases) {
 			data = (T) resolveAliases(data);
 		}
-		return  data;
+		return retainFields(data);
 	}
 	
 	public  <T extends DataPersistence> T fromURL(URL url){
@@ -163,7 +190,7 @@ public abstract class DataPersistence {
 		if (resolveAliases) {
 			data = (T) resolveAliases(data);
 		}
-		return data;
+		return retainFields(data);
 	}
 	
 	public  <T extends DataPersistence> T fromInputStream(InputStream inputStream) {
@@ -209,7 +236,7 @@ public abstract class DataPersistence {
 		if (resolveAliases) {
 			data = (T) resolveAliases(data);
 		}
-		return data;
+		return retainFields(data);
 	}
 
 	public  <T extends DataPersistence> T fromFile(String filePath){
@@ -264,12 +291,12 @@ public abstract class DataPersistence {
 	}
 	
 	public void generateData(){
-		DataPersistence obj = new DataGenerator().generate(this.getClass());
+		DataPersistence obj = new DataGenerator(getXstream()).generate(this.getClass());
 		deepCopy(obj, this);
 	}
 	
 	public String generateXML(){
-		DataPersistence obj = new DataGenerator().generate(this.getClass());
+		DataPersistence obj = new DataGenerator(getXstream()).generate(this.getClass());
 		return obj.toXML();
 	}
 

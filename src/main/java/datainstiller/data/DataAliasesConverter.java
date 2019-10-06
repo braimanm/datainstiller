@@ -83,7 +83,7 @@ public class DataAliasesConverter implements Converter {
 				if (matcher.find() != true) {
 					throw new PatternUnmarshalException(value + " - invalid data generation expression!");
 				}	
-				GeneratorInterface genType = new DataGenerator().getGenerator(matcher.group(1).trim());
+				GeneratorInterface genType = new DataGenerator(new XStream()).getGenerator(matcher.group(1).trim());
 				String init = matcher.group(2);
 				String val = matcher.group(3);
 				value = genType.generate(init, val);

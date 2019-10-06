@@ -1,5 +1,6 @@
 package datainstiller.data;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import datainstiller.data.Data2.Data3;
 import datainstiller.data.Data2.Data4;
@@ -61,7 +62,7 @@ public class TestGenerator extends DataPersistence {
 	
 	@Test
 	public void test_inner_classes_generation(){
-		DataGenerator gen = new DataGenerator();
+		DataGenerator gen = new DataGenerator(new XStream());
 		Data3 data3 = gen.generate(Data3.class);
 		Assert.assertNull(data3);
 		Data4 data4 =  gen.generate(Data4.class);
@@ -70,7 +71,7 @@ public class TestGenerator extends DataPersistence {
 	
 	@Test
 	public void test(){
-		DataGenerator gen = new DataGenerator();
+		DataGenerator gen = new DataGenerator(new XStream());
 		System.out.println(gen.getGenerator("ADDRESS").generate("{#} {S}, {T}, {O}, {K} ({P})",null));
 		System.out.println(gen.getGenerator("ALPHANUMERIC").generate("{A}{B}{C}{D}(a)(A)(a)",null));
 		System.out.println(gen.getGenerator("CUSTOM_LIST").generate(null, "aaa,bbb,ccc,ddd"));
