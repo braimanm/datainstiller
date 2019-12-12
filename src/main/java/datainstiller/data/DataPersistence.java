@@ -31,6 +31,7 @@ import org.testng.annotations.Test;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -113,21 +114,50 @@ public abstract class DataPersistence {
 	}
 
 	private <T extends DataPersistence> T retainFields(T target) {
-		Class cls = this.getClass();
+		Class<?> cls = this.getClass();
 		do {
 			for (Field field : cls.getDeclaredFields()) {
 				field.setAccessible(true);
 				if (!field.isAnnotationPresent(XStreamOmitField.class) ||
-						(field.isAnnotationPresent(Data.class) && field.getAnnotation(Data.class).skip() == false)) {
-					Object value = null;
+						(field.isAnnotationPresent(Data.class) && !field.getAnnotation(Data.class).skip())) {
+					Object defaultPrimitiveValue = null;
+					if (field.getType().isPrimitive()) {
+						switch (field.getType().getName()) {
+							case "byte":
+								defaultPrimitiveValue = (byte) 0;
+								break;
+							case "short":
+								defaultPrimitiveValue = (short) 0;
+								break;
+							case "int":
+								defaultPrimitiveValue = 0;
+								break;
+							case "long":
+								defaultPrimitiveValue = 0L;
+								break;
+							case "float":
+								defaultPrimitiveValue = 0.0f;
+								break;
+							case "double":
+								defaultPrimitiveValue = 0.0d;
+								break;
+							case "char":
+								defaultPrimitiveValue = '\u0000';
+								break;
+							case "boolean":
+								defaultPrimitiveValue = false;
+								break;
+						}
+					}
+					Object value;
 					try {
 						value = field.get(this);
 						if (value != null) {
-							field.set(target, value);
+							if (defaultPrimitiveValue == null || !value.equals(defaultPrimitiveValue)) {
+								field.set(target, value);
+							}
 						}
-					} catch (IllegalAccessException ignore) {
-						ignore.printStackTrace();
-					}
+					} catch (IllegalAccessException ignore) {}
 				}
 			}
 
@@ -263,13 +293,12 @@ public abstract class DataPersistence {
 		Writer writer=null;
 		try {
 			fos=new FileOutputStream(filePath);
-			writer=new OutputStreamWriter(fos, "UTF-8");
+			writer=new OutputStreamWriter(fos, StandardCharsets.UTF_8);
 			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n");
 			getXstream().toXML(this, writer);
 		} catch ( IOException e) {
 			throw new RuntimeException(e);
 		} finally{
-			
 				try {
 					if (writer!=null) writer.close();
 					if (fos!=null) fos.close();

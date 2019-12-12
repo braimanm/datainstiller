@@ -4,7 +4,7 @@
 
     <groupId>com.googlecode.datainstiller</groupId>
     <artifactId>datainstiller</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
     <packaging>jar</packaging>
     <name>datainstiller</name>
     <url>https://code.google.com/p/datainstiller/</url>

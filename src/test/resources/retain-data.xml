@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<retain>
+    <b>1</b>
+    <sh>2</sh>
+    <i>3</i>
+    <l>4</l>
+    <f>0.1</f>
+    <d>0.2</d>
+    <c>A</c>
+    <bo>true</bo>
+    <s>String</s>
+    <bb>11</bb>
+    <shsh>12</shsh>
+    <ii>13</ii>
+    <ll>14</ll>
+    <ff>0.3</ff>
+    <dd>0.4</dd>
+    <cc>B</cc>
+    <bobo>false</bobo>
+    <ss>Null</ss>
+</retain>
