@@ -16,6 +16,7 @@ Copyright 2010-2019 Michael Braiman braimanm@gmail.com
 
 package datainstiller.data;
 
+@SuppressWarnings("unused")
 public class PatternUnmarshalException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;

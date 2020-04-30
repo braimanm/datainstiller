@@ -26,7 +26,7 @@ import java.util.List;
 public class File2ListReader {
 
 	public List<String> populate(String fileName) {
-		List<String> listToPopulate = new ArrayList<String>();
+		List<String> listToPopulate = new ArrayList<>();
 		InputStream inStream = this.getClass().getResourceAsStream(fileName);
 		if (inStream == null)
 			throw new RuntimeException("Resource file: " + fileName + " was not found!");
@@ -38,7 +38,7 @@ public class File2ListReader {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (reader != null) reader.close();
+				reader.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

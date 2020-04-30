@@ -46,13 +46,13 @@ public class AlphaNumericGenerator implements GeneratorInterface{
 	
 	public String generate(String pattern){
 		String out = pattern;
-		Pattern patt = Pattern.compile("[|\\[\\(\\{][a-zA-Z][|\\]\\)\\}]");
+		Pattern patt = Pattern.compile("[|\\[({][a-zA-Z][|\\])}]");
 		Matcher matcher = patt.matcher(pattern);
 
 		while (matcher.find()){
 			char bracket = matcher.group().charAt(0);
 			char c = matcher.group().charAt(1);
-			boolean upperCase = false;
+			boolean upperCase;
 			String value = null;
 			upperCase = (c >= 65 && c <= 90);
 			if (bracket == 40) {
@@ -76,6 +76,7 @@ public class AlphaNumericGenerator implements GeneratorInterface{
 					value = getLetter(false);
 				}
 			}
+			assert value != null;
 			out = out.replace(matcher.group(), value);
 		}
 		return out;

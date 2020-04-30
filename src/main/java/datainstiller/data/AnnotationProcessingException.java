@@ -16,6 +16,7 @@ Copyright 2010-2019 Michael Braiman
 
 package datainstiller.data;
 
+@SuppressWarnings("unused")
 public class AnnotationProcessingException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 

@@ -16,6 +16,7 @@ Copyright 2010-2019 Michael Braiman braimanm@gmail.com
 
 package datainstiller.data;
 
+@SuppressWarnings("unused")
 public class FieldData {
 	private Class<?>[] clasz = null;
 	private String alias = null;
@@ -31,6 +32,7 @@ public class FieldData {
 	}
 	
 	public FieldData(Data data) {
+		//noinspection EqualsBetweenInconvertibleTypes
 		clasz = (data.clasz().equals(void.class)) ? null : data.clasz();
 		alias = data.alias().isEmpty() ? null : data.alias();
 		generatorType = data.generatorType().isEmpty() ? null : data.generatorType();
@@ -45,7 +47,7 @@ public class FieldData {
 	}
 
 	public String resolveAlias() {
-		if (fieldDataStore!=null && alias!=null){
+		if (fieldDataStore !=null && alias !=null){
 			return fieldDataStore.getAliases().get(alias);
 		}
 		return null;
@@ -127,7 +129,5 @@ public class FieldData {
 		this.skipField = skipField;
 		return this;
 	}
-
-	
 	
 }

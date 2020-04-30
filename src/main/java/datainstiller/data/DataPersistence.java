@@ -13,7 +13,6 @@ Copyright 2010-2019 Michael Braiman braimanm@gmail.com
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-
 package datainstiller.data;
 
 import com.thoughtworks.xstream.XStream;
@@ -22,20 +21,17 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.extended.ISO8601GregorianCalendarConverter;
 import datainstiller.generators.*;
-import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.MapContext;
 import org.testng.annotations.Test;
-
 import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Michael Braiman braimanm@gmail.com
@@ -43,8 +39,9 @@ import java.util.Map;
  * This class encapsulate object persistence capabilities. It allows to persist any derived from this class object with all his data.
  * All the class members which are not annotated with {@link XStreamOmitField} are serialized and deserialized to and from various formats 
  */
+@SuppressWarnings("unused")
 public abstract class DataPersistence {
-	@Data(skip = true)
+	@XStreamOmitField
 	private JexlContext jexlContext;
 	@Data(skip = true)
     @XStreamAlias("xmlns")
@@ -68,6 +65,9 @@ public abstract class DataPersistence {
 		return aliases;
 	}
 
+	protected void removeAliases() {
+		this.aliases = null;
+	}
 
     protected XStream getXstream() {
 		XStream xstream = new XStream();
@@ -79,9 +79,6 @@ public abstract class DataPersistence {
 
 
 	private void initJexlContext() {
-	    if(jexlContext != null) {
-	        System.out.println("WARNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        }
 	    JexlContext jContext = new MapContext();
 		jContext.set("AddressGen", new AddressGenerator());
 		jContext.set("AlphaNumericGen", new AlphaNumericGenerator());
@@ -101,16 +98,20 @@ public abstract class DataPersistence {
 	protected void initJexlContext(JexlContext jexlContext) {
 	}
 
-	private  <T extends DataPersistence> Object resolveAliases(DataPersistence data) {
-		DataAliases aliases = data.aliases;
-		data.aliases = null;
-		String xml = data.toXML();
-		for (String key : aliases.keySet()){
-			String alias = "${" + key + "}";
-			String value = aliases.get(key);
-			xml = xml.replace(alias, value); 
+	private  <T extends DataPersistence> T resolveAliases(T data) {
+		DataAliases aliases = data.getDataAliases();
+		if (aliases != null) {
+			data.removeAliases();
+			String xml = data.toXML();
+			for (String key : aliases.keySet()) {
+				String alias = "${" + key + "}";
+				String value = aliases.get(key);
+				xml = xml.replace(alias, value);
+			}
+			//noinspection unchecked
+			return (T) getXstream().fromXML(xml);
 		}
-		return getXstream().fromXML(xml);
+		return data;
 	}
 
 	private <T extends DataPersistence> T retainFields(T target) {
@@ -153,7 +154,7 @@ public abstract class DataPersistence {
 					try {
 						value = field.get(this);
 						if (value != null) {
-							if (defaultPrimitiveValue == null || !value.equals(defaultPrimitiveValue)) {
+							if (!value.equals(defaultPrimitiveValue)) {
 								field.set(target, value);
 							}
 						}
@@ -177,7 +178,7 @@ public abstract class DataPersistence {
 		initJexlContext();
 		T data = (T) getXstream().fromXML(xml);
 		if (resolveAliases) {
-			data = (T) resolveAliases(data);
+			data = resolveAliases(data);
 		}
 		return retainFields(data);
 	}
@@ -197,7 +198,7 @@ public abstract class DataPersistence {
 		initJexlContext();
 		T data=(T) getXstream().fromXML(url);
 		if (resolveAliases) {
-			data = (T) resolveAliases(data);
+			data = resolveAliases(data);
 		}
 		return retainFields(data);
 	}
@@ -218,7 +219,7 @@ public abstract class DataPersistence {
 		initJexlContext();
 		T data=(T) getXstream().fromXML(inputStream);
 		if (resolveAliases) {
-			data = (T) resolveAliases(data);
+			data = resolveAliases(data);
 		}
 		return retainFields(data);
 	}
@@ -264,7 +265,7 @@ public abstract class DataPersistence {
 		}
 		T data=(T) getXstream().fromXML(file);
 		if (resolveAliases) {
-			data = (T) resolveAliases(data);
+			data = resolveAliases(data);
 		}
 		return retainFields(data);
 	}
@@ -289,22 +290,11 @@ public abstract class DataPersistence {
 	 * @param filePath file path to serialize this object
 	 */
 	public void toFile(String filePath){
-		FileOutputStream fos=null;
-		Writer writer=null;
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n" + getXstream().toXML(this);
 		try {
-			fos=new FileOutputStream(filePath);
-			writer=new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-			writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n");
-			getXstream().toXML(this, writer);
-		} catch ( IOException e) {
+			Files.write(Paths.get(filePath), xml.getBytes(StandardCharsets.UTF_8));
+		} catch (IOException e) {
 			throw new RuntimeException(e);
-		} finally{
-				try {
-					if (writer!=null) writer.close();
-					if (fos!=null) fos.close();
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
 		}
 	}
 	
@@ -331,7 +321,7 @@ public abstract class DataPersistence {
 
 	//Allows to generate data using IDE
 	@Test
-	public void generate() {
+	protected void generate() {
 		System.out.println(generateXML());
 	}
 	

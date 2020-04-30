@@ -48,7 +48,6 @@ public class DataAliasesConverter implements Converter {
         }
     }
 
-    @SuppressWarnings("rawtypes")
 	@Override
 	public boolean canConvert(Class type) {
 		return (type.equals(DataAliases.class));
@@ -60,7 +59,7 @@ public class DataAliasesConverter implements Converter {
 			DataAliases aliases=(DataAliases)source;
 			for (String key:aliases.map.keySet()){
 				writer.startNode(key);
-				writer.setValue(aliases.get(key).toString());
+				writer.setValue(aliases.get(key));
 				writer.endNode();
 			}
 		}
@@ -80,7 +79,7 @@ public class DataAliasesConverter implements Converter {
             if (value.matches("\\$\\[.+]")) {
                 Pattern pattern = Pattern.compile("\\$\\[(.+)\\(\\s*'\\s*(.*)\\s*'\\s*,\\s*'\\s*(.*)\\s*'\\s*\\)");
                 Matcher matcher = pattern.matcher(value);
-				if (matcher.find() != true) {
+				if (!matcher.find()) {
 					throw new PatternUnmarshalException(value + " - invalid data generation expression!");
 				}	
 				GeneratorInterface genType = new DataGenerator(new XStream()).getGenerator(matcher.group(1).trim());

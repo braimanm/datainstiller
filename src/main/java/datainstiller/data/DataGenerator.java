@@ -21,27 +21,27 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.converters.collections.ArrayConverter;
+import com.thoughtworks.xstream.converters.collections.CharArrayConverter;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.converters.collections.MapConverter;
 import com.thoughtworks.xstream.converters.enums.EnumConverter;
 import com.thoughtworks.xstream.converters.enums.EnumSetConverter;
+import com.thoughtworks.xstream.converters.extended.EncodedByteArrayConverter;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
 import com.thoughtworks.xstream.core.util.Primitives;
 import datainstiller.generators.*;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@SuppressWarnings("unused")
 public class DataGenerator {
 	private int nArray = 3;
-	private int recursionLevel = 0; 
-	private FieldDataStore fieldDataStore;
-	private Map<String,Integer> classes;
-	private Map<String,GeneratorInterface> generatorStore;
+	private int recursionLevel = 2;
+	private FieldReferenceCounter recursionCounter = new FieldReferenceCounter();
+	private FieldDataStore fieldDataStore = new FieldDataStore();
+	private Map<String,GeneratorInterface> generatorStore = new HashMap<>();
 	private XStream xstream;
 
 	public DataGenerator(XStream xstream) {
@@ -50,8 +50,6 @@ public class DataGenerator {
 	
 	public DataGenerator(XStream xstream, List<DataValueConverter> converters){
 		this.xstream = xstream;
-		fieldDataStore = new FieldDataStore();
-		generatorStore = new HashMap<>();
 		registerGenerator("ADDRESS", new AddressGenerator());
 		registerGenerator("ALPHANUMERIC", new AlphaNumericGenerator());
 		registerGenerator("CUSTOM_LIST",new CustomListGenerator());
@@ -60,7 +58,7 @@ public class DataGenerator {
 		registerGenerator("WORD",new WordGenerator());
 		registerGenerator("NUMBER",new NumberGenerator());
 		registerGenerator("FILE2LIST",new File2ListGenerator());
-        if (converters!=null) {
+        if (converters != null) {
             for (Converter converter : converters){
             	xstream.registerConverter(converter);
             }
@@ -71,18 +69,48 @@ public class DataGenerator {
 		return  generatorStore.get(generator);
 	}
 	
-	public void registerGenerator(String key, GeneratorInterface generator){
+	public void registerGenerator(String key, GeneratorInterface generator) {
 		generatorStore.put(key, generator);
 	}
 		
 	public int getRecursionLevel() {
 		return recursionLevel;
 	}
-	
+
 	public void setRecursionLevel(int recursionLevel) {
-		this.recursionLevel = recursionLevel;
+		if (recursionLevel <= 0) {
+			this.recursionLevel = 1;
+		} else {
+			this.recursionLevel = recursionLevel;
+		}
 	}
-	
+
+	public int getnArray() {
+		return nArray;
+	}
+
+	public void setnArray(int n) {
+		if (n <= 0) {
+			this.nArray = 1;
+		} else {
+			this.nArray = n;
+		}
+	}
+
+	private int getnArrayForField(Field field) {
+		int n = nArray;
+		FieldData fieldData = fieldDataStore.getData(field);
+		if (fieldData != null && fieldData.nArray() > 0) {
+			n = fieldData.nArray();
+		}
+		return n;
+	}
+
+	public Object deepCopy(Object source){
+		String xml = xstream.toXML(source);
+		return xstream.fromXML(xml);
+	}
+
 	private String getGeneratedValue(FieldData fieldData){
 		String value = fieldData.value();
 		String alias = fieldData.alias();
@@ -105,7 +133,7 @@ public class DataGenerator {
 			fieldDataStore.getAliases().put(alias, value);
 			return "${" + alias + "}";
 		}
-		
+
 		return value;
 	}
 
@@ -115,10 +143,10 @@ public class DataGenerator {
         if (fieldData != null) {
             returnValue = getGeneratedValue(fieldData);
         }
-		if(cls.isArray()){
+		if (cls.isArray()){
 			cls = cls.getComponentType();
 		}
-		if (cls.isPrimitive() || Primitives.unbox(cls)!=null || cls.isEnum()) {
+		if (cls.isPrimitive() || Primitives.unbox(cls) !=null || cls.isEnum()) {
             if (returnValue == null || returnValue.isEmpty()) {
             	if (cls.equals(char.class)) {
             		return "";
@@ -182,10 +210,10 @@ public class DataGenerator {
     @SuppressWarnings("restriction")
 	private Class<?> getGenericTypeOrString(Field field,int argumentNum){
 		Type type = field.getGenericType();
-		if (type!=null && type instanceof sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl){
-			Type realType = ((sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl)type).getActualTypeArguments()[argumentNum];
-			if (!(realType instanceof sun.reflect.generics.reflectiveObjects.WildcardTypeImpl)){
-				if (realType instanceof sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl){
+		if (type instanceof ParameterizedType){
+			Type realType = ((ParameterizedType)type).getActualTypeArguments()[argumentNum];
+			if (!(realType instanceof WildcardType)){
+				if (realType instanceof ParameterizedType){
 					System.err.println("[WARNING] Collection of collection is not supported in field " + field);
 					return null;
 				} else {
@@ -195,14 +223,10 @@ public class DataGenerator {
 		}
 		return String.class;
 	}
-	
+
 	public <T> T generate(Class<T> cls) {
-		if (isInnerClass(cls)){
-			return null;
-		}
-		
-		classes = new HashMap<>();
-		T obj = generate(cls,null,false);
+
+		T obj = generate(cls, null);
 		
 		if (fieldDataStore.getAliases().size()>0 ){
 			boolean dataAliasesFound = false;
@@ -213,15 +237,15 @@ public class DataGenerator {
 						try {
 							field.setAccessible(true);
 							field.set(obj,fieldDataStore.getAliases());
-							dataAliasesFound =true;
+							dataAliasesFound = true;
 							break;
 						} catch (IllegalArgumentException | IllegalAccessException e) {
 							throw new RuntimeException(e);
 						}
 					}
 				}
-				clz=clz.getSuperclass();
-			} while(clz!=null);
+				clz = clz.getSuperclass();
+			} while(clz != null);
 			
 			if (!dataAliasesFound) {
 				throw new AliasWriteException("Can't save aliases! The generated class or its supper class should have DataAliases type field declared.");
@@ -232,68 +256,79 @@ public class DataGenerator {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes", "restriction" })
-	private <T> T generate(Class<T> cls, Field ffield,boolean arrayOrColection) {
+	private <T> T generate(Class<T> cls, Field ffield) {
 		processAnnotations(cls);
 
 		Converter conv = xstream.getConverterLookup().lookupConverterForType(cls);
-		
+
 		if (conv instanceof DataValueConverter) {
 			String stringValue = generateValueForField(cls,ffield);
-			Object value = ((DataValueConverter) conv).fromString(stringValue, cls, ffield);
-			return (T) value;
+			return ((DataValueConverter) conv).fromString(stringValue, cls, ffield);
 		}
 		
-		if (conv instanceof SingleValueConverter){
+		if (conv instanceof SingleValueConverter && !(conv instanceof EncodedByteArrayConverter)) {
 			String stringValue = generateValueForField(cls,ffield);
 			Object value = ((SingleValueConverter) conv).fromString(stringValue);
 			return (T) value;
 		}
-		
-		if (conv instanceof ArrayConverter){
-			int n=nArray;
-			FieldData fieldData = fieldDataStore.getData(ffield);
-			if (fieldData!=null && fieldData.nArray()>0) { 
-				n=fieldData.nArray();
-			}
-			T array = (T) Array.newInstance(cls.getComponentType(), n);
 
-			for (int i=0;i<n;i++){
-				Array.set(array, i, generate(cls.getComponentType(), ffield,true));
+
+		if (conv instanceof ArrayConverter || conv instanceof CharArrayConverter || conv instanceof EncodedByteArrayConverter){
+			int n = getnArrayForField(ffield);
+			T array = (T) Array.newInstance(cls.getComponentType(), n);
+            Object element = generate(cls.getComponentType(), ffield);
+			for (int i=0; i<n; i++){
+				if (i > 0) {
+					element = deepCopy(element);
+				}
+				Array.set(array, i, element);
 			}
 			return array;
 		}
-		
+
+		Class concreteCollectionClass = null;
 		if (cls.isInterface() || Modifier.isAbstract(cls.getModifiers())) {
 			FieldData fieldData = fieldDataStore.getData(ffield);
 			if (fieldData!=null && fieldData.clasz()!=null){
 				for (Class<?> clz: fieldData.clasz()){
 					if (cls.isAssignableFrom(clz)){
-						return (T) generate(clz, ffield,arrayOrColection);
+						return (T) generate(clz, ffield);
 					}
-				}	
-			}
-			Class[] collection = new Class[]{ArrayList.class,HashSet.class,HashMap.class};
-			for (Class<?> clz: collection){
-				if (cls.isAssignableFrom(clz)){
-					return (T) generate(clz, ffield,arrayOrColection);
 				}
-			}	
-			System.err.println("[WARNING] Please provide implimentation class for " + cls.getCanonicalName() + " field '" + ffield + "'");
-			return null;
-		} 
+			}
+
+			Class[] collection = new Class[]{ArrayList.class, HashSet.class, HashMap.class};
+			for (Class<?> clz: collection){
+				if (cls.isAssignableFrom(clz)) {
+					concreteCollectionClass = clz;
+					conv = xstream.getConverterLookup().lookupConverterForType(clz);
+					break;
+				}
+			}
+
+			if (concreteCollectionClass == null) {
+				System.err.println("[WARNING] Please provide implimentation class for " + cls.getCanonicalName() + " field '" + ffield + "'");
+				return null;
+			}
+		}
 		
 		if (conv instanceof CollectionConverter){
+			int n = getnArrayForField(ffield);
             Collection collection;
+            if (concreteCollectionClass == null) concreteCollectionClass = cls;
             try {
-                collection = (Collection) cls.newInstance();
+            	collection = (Collection) concreteCollectionClass.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
-			
 			Class element = getGenericTypeOrString(ffield,0);
-			if (element!=null){
-				for (int i=0;i<nArray;i++){
-					collection.add(generate(element, ffield,true));
+			if (element != null) {
+				Object colElement = generate(element, ffield);
+				for (int i = 0; i < n; i++) {
+					if (i > 0) {
+						colElement = deepCopy(colElement);
+					}
+					collection.add(colElement);
 				}
 			}
 			return (T) collection;
@@ -301,15 +336,18 @@ public class DataGenerator {
 		
 		if (conv instanceof MapConverter){
 			Map map = null;
+			if (concreteCollectionClass == null) concreteCollectionClass = cls;
 			try {
-				map = (Map) cls.newInstance();
+				map = (Map) concreteCollectionClass.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
 				e.printStackTrace();
 			}
 			Class keyElement = getGenericTypeOrString(ffield, 0);
 			Class valueElement = getGenericTypeOrString(ffield, 1);
-			if (keyElement!=null && valueElement!=null){			
-				map.put(generate(keyElement,ffield,false), generate(valueElement,ffield,false));
+			if (keyElement!=null && valueElement!=null){
+				if (map != null) {
+					map.put(generate(keyElement, ffield), generate(valueElement, ffield));
+				}
 			}
 			return (T) map;
 		}
@@ -320,29 +358,25 @@ public class DataGenerator {
 		
 		if (conv instanceof EnumSetConverter){
 			Type type = ffield.getGenericType();
-			if (type!=null && type instanceof sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl){
-				Class genType = (Class) ((sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl)type).getActualTypeArguments()[0];
+			if (type instanceof ParameterizedType){
+				Class genType = (Class) ((ParameterizedType)type).getActualTypeArguments()[0];
 				Enum e = (Enum) genType.getEnumConstants()[Integer.parseInt(generateValueForField(genType,ffield))];
 				return (T) EnumSet.of(e);
 			}
 		}
 		
-		if (conv instanceof ReflectionConverter){
-			if (ffield!=null && !arrayOrColection){
-		    	String key = ffield.toString();
-		    	Integer i = classes.get(key);
-		    	if (i==null){
-		    		i=0;
-		    	} else {
-		    		if (i==recursionLevel) {
-		    			return null;
-		    		}
-		    		i++;
-		    	}
-		    	classes.put(key, i);
-		    }
-			
+		if (conv instanceof ReflectionConverter) {
+
 			Object obj = xstream.getReflectionProvider().newInstance(cls);
+
+			if (ffield != null) {
+				if (recursionCounter.getCounter(ffield) < recursionLevel) {
+					recursionCounter.incrementCounter(ffield);
+				} else {
+					return (T) obj;
+				}
+			}
+
 			Class superCls = cls;
 			do {	
 				for (Field field : superCls.getDeclaredFields()){
@@ -361,8 +395,8 @@ public class DataGenerator {
 					if (Modifier.isStatic(field.getModifiers())){
 						continue;
 					}
-					
-					Object value = generate(field.getType(),field,false);
+
+					Object value = generate(field.getType(), field);
 					try {
 						field.set(obj, value);
                     } catch (IllegalArgumentException | IllegalAccessException | NullPointerException e) {
@@ -370,7 +404,8 @@ public class DataGenerator {
                     }
 				}
 				superCls = superCls.getSuperclass();
-			} while (superCls!=null);
+			} while (superCls != null);
+
 			return (T) obj;
 		}
 		
@@ -378,7 +413,7 @@ public class DataGenerator {
 			//No data should be generated for DataAliasesConverter
 			return null;
 		}
-		
+
 		System.err.println("[WARNING] Converter type: " + conv.getClass().getName() + ". Can't generate data for field " + ffield);
 		return null;
 	}

@@ -1,6 +1,6 @@
-package datainstiller.data;
+package datainstiller.test;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import datainstiller.data.RetainData;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -18,8 +18,8 @@ public class TestRetainFields {
         Assert.assertEquals(data.bo, data.bobo);
         Assert.assertEquals(data.s, data.ss);
         Assert.assertEquals(data.bskip,(byte) 45);
-        Assert.assertEquals(data.bstat,(byte) 55);
-        Assert.assertEquals(data.bstatfinal,(byte) 65);
+        Assert.assertEquals(RetainData.bstat,(byte) 55);
+        Assert.assertEquals(RetainData.bstatfinal,(byte) 65);
     }
 
     @Test

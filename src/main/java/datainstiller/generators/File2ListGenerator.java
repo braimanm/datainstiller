@@ -18,6 +18,7 @@ package datainstiller.generators;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class File2ListGenerator extends File2ListReader implements GeneratorInterface{
 	private List<String> list;
 	

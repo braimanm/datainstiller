@@ -20,6 +20,7 @@ package datainstiller.generators;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class CustomListGenerator implements GeneratorInterface{
 	private List<String> list;
 

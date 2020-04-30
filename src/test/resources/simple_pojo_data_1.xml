@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<simple-pojo>
+    <bytePrimitive>1</bytePrimitive>
+    <byteType>2</byteType>
+    <shortPrimitive>3</shortPrimitive>
+    <shortType>4</shortType>
+    <intPrimitive>5</intPrimitive>
+    <integerType>6</integerType>
+    <longPrimitive>7</longPrimitive>
+    <longType>8</longType>
+    <floatPrimitive>9.0</floatPrimitive>
+    <floatType>10.0</floatType>
+    <doublePrimitive>11.0</doublePrimitive>
+    <doubleType>12.0</doubleType>
+    <booleanPrimitive>true</booleanPrimitive>
+    <booleanType>true</booleanType>
+    <charPrimitive>a</charPrimitive>
+    <characterType>B</characterType>
+    <stringType>stringType</stringType>
+</simple-pojo>

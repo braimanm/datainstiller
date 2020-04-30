@@ -20,12 +20,13 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class FieldDataStore {
 	private Map<Field,FieldData> fieldDataStore;
 	private DataAliases aliases;
 	
 	FieldDataStore() {
-		fieldDataStore = new HashMap<Field, FieldData>();
+		fieldDataStore = new HashMap<>();
 		aliases = new  DataAliases();
 	}
 	
@@ -76,5 +77,4 @@ public class FieldDataStore {
 		return fieldDataStore.containsKey(key);
 	}
 
-	
 }

@@ -30,6 +30,7 @@ public class WordGenerator extends File2ListReader implements GeneratorInterface
 		}
 	}
 
+	@SuppressWarnings("SameParameterValue")
 	private String getWord(int lettersCount, boolean fromStart, int letterCase) {
 		init();
 		int count = lettersCount;
@@ -45,11 +46,9 @@ public class WordGenerator extends File2ListReader implements GeneratorInterface
 		if (lettersCount == 0) count = (int) (Math.random() * 10) + 1;
 		if (count > word.length()) return word;
 		if (fromStart) {
-			String ret = word.substring(0, count);
-			return ret;
+			return word.substring(0, count);
 		} else {
-			String ret = word.substring(word.length() - count);
-			return ret;
+			return word.substring(word.length() - count);
 		}		
 	}
 	

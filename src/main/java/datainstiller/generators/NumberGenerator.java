@@ -18,6 +18,7 @@ package datainstiller.generators;
 
 import java.text.DecimalFormat;
 
+@SuppressWarnings("unused")
 public class NumberGenerator implements GeneratorInterface{
 	
 	long minNum;
