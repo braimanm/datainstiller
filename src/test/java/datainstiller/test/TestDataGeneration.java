@@ -18,12 +18,24 @@ import java.util.stream.Collectors;
 
 public class TestDataGeneration {
 
+    private String getExpectedDataFromResource(String resourceFile) {
+        URL url = Thread.currentThread().getContextClassLoader().getResource(resourceFile);
+        assert url != null;
+        String xmlActual = null;
+        try {
+            xmlActual = new String(Files.readAllBytes(Paths.get(url.toURI()))).replace(" ","");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return xmlActual;
+    }
+
     @Test
     public void testDataSerialization() throws URISyntaxException, IOException {
         String resourceFile = "simple_pojo_data_1.xml";
-        URL url = Thread.currentThread().getContextClassLoader().getResource(resourceFile);
-        assert url != null;
-        String xmlActual = new String(Files.readAllBytes(Paths.get(url.toURI()))).replace(" ","");
+        String xmlActual = getExpectedDataFromResource(resourceFile);
         SimplePOJO simplePOJO = new SimplePOJO().fromResource(resourceFile);
         String xmlExpected = simplePOJO.toXML().replace(" ","");
         Assert.assertEquals(xmlActual.trim(), xmlExpected.trim());
@@ -209,5 +221,13 @@ public class TestDataGeneration {
 
     }
 
+    @Test
+    public void test_multiple_data_references() {
+        String xmlExpected = getExpectedDataFromResource("GenericConsumerData.xml").trim();
+        GenericDataConsumer data = new GenericDataConsumer();
+        data.generateData();
+        String xmlActual = data.toXML().replace(" ","").trim();
+        Assert.assertEquals(xmlActual, xmlExpected);
+    }
 
 }

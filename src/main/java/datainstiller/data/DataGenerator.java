@@ -283,6 +283,7 @@ public class DataGenerator {
 				}
 				Array.set(array, i, element);
 			}
+			recursionCounter.reset(ffield);
 			return array;
 		}
 
@@ -331,6 +332,7 @@ public class DataGenerator {
 					collection.add(colElement);
 				}
 			}
+			recursionCounter.reset(ffield);
 			return (T) collection;
 		}
 		
@@ -378,7 +380,7 @@ public class DataGenerator {
 			}
 
 			Class superCls = cls;
-			do {	
+			do {
 				for (Field field : superCls.getDeclaredFields()){
                     if (isInnerClass(field.getType())) {
                         System.err.println("          Field '" + field.getName() + "' was skipped by generator.");
