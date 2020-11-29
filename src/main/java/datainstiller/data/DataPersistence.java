@@ -39,7 +39,6 @@ import java.time.format.DateTimeFormatter;
  * This class encapsulate object persistence capabilities. It allows to persist any derived from this class object with all his data.
  * All the class members which are not annotated with {@link XStreamOmitField} are serialized and deserialized to and from various formats 
  */
-@SuppressWarnings("unused")
 public abstract class DataPersistence {
 	@XStreamOmitField
 	private JexlContext jexlContext;
@@ -69,14 +68,17 @@ public abstract class DataPersistence {
 		this.aliases = null;
 	}
 
-    protected XStream getXstream() {
+	protected XStream getXstream() {
+		return getXstream(null);
+	}
+
+    protected XStream getXstream(DataAliases globalAliases) {
 		XStream xstream = new XStream();
-		xstream.registerConverter(new DataAliasesConverter(jexlContext));
+		xstream.registerConverter(new DataAliasesConverter(jexlContext, globalAliases));
 		xstream.registerConverter(new ISO8601GregorianCalendarConverter());
 		xstream.processAnnotations(this.getClass());
 		return xstream;
 	}
-
 
 	private void initJexlContext() {
 	    JexlContext jContext = new MapContext();
@@ -105,7 +107,7 @@ public abstract class DataPersistence {
 			String xml = data.toXML();
 			for (String key : aliases.keySet()) {
 				String alias = "${" + key + "}";
-				String value = aliases.get(key);
+				String value = aliases.getAsString(key);
 				xml = xml.replace(alias, value);
 			}
 			//noinspection unchecked

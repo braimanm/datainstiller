@@ -16,7 +16,6 @@ Copyright 2010-2019 Michael Braiman braimanm@gmail.com
 
 package datainstiller.data;
 
-@SuppressWarnings("unused")
 public class FieldData {
 	private Class<?>[] clasz = null;
 	private String alias = null;
@@ -48,7 +47,7 @@ public class FieldData {
 
 	public String resolveAlias() {
 		if (fieldDataStore !=null && alias !=null){
-			return fieldDataStore.getAliases().get(alias);
+			return fieldDataStore.getAliases().getAsString(alias);
 		}
 		return null;
 	}

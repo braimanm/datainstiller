@@ -35,7 +35,6 @@ import java.lang.reflect.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@SuppressWarnings("unused")
 public class DataGenerator {
 	private int nArray = 3;
 	private int recursionLevel = 2;
@@ -114,7 +113,7 @@ public class DataGenerator {
 	private String getGeneratedValue(FieldData fieldData){
 		String value = fieldData.value();
 		String alias = fieldData.alias();
-        String aliasValue = (alias != null) ? fieldDataStore.getAliases().get(alias) : null;
+        String aliasValue = (alias != null) ? fieldDataStore.getAliases().getAsString(alias) : null;
 
         if (aliasValue != null) {
             return "${" + alias + "}";

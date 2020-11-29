@@ -24,16 +24,14 @@ public class TestDataGeneration {
         String xmlActual = null;
         try {
             xmlActual = new String(Files.readAllBytes(Paths.get(url.toURI()))).replace(" ","");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
         return xmlActual;
     }
 
     @Test
-    public void testDataSerialization() throws URISyntaxException, IOException {
+    public void testDataSerialization() {
         String resourceFile = "simple_pojo_data_1.xml";
         String xmlActual = getExpectedDataFromResource(resourceFile);
         SimplePOJO simplePOJO = new SimplePOJO().fromResource(resourceFile);
@@ -182,10 +180,10 @@ public class TestDataGeneration {
             String aliasValue;
             if (!fieldName.contains("boolean")) {
                 Assert.assertTrue(simplePOJOArray.getDataAliases().containsKey(fieldName));
-                aliasValue = simplePOJOArray.getDataAliases().get(fieldName);
+                aliasValue = simplePOJOArray.getDataAliases().getAsString(fieldName);
             } else {
                 Assert.assertTrue(simplePOJOArray.getDataAliases().containsKey("booleanTrue"));
-                aliasValue = simplePOJOArray.getDataAliases().get("booleanTrue");
+                aliasValue = simplePOJOArray.getDataAliases().getAsString("booleanTrue");
             }
             Assert.assertEquals(aliasValue, expectedAliasValue);
             Assert.assertEquals(actual, expected);

@@ -28,9 +28,9 @@ import java.util.Set;
  * 			This class represents aliases store. The only reason to have this class is for serialization and deserialization
  * 			of aliases by special XStream converter {@link DataAliasesConverter}. This class implements Map interface.    
  */
-public class DataAliases implements Map<String, String> {
+public class DataAliases implements Map<String, Object> {
 	@XStreamOmitField
-	Map<String, String> map;
+	Map<String, Object> map;
 
 	public DataAliases() {
 		map = new HashMap<>();
@@ -52,13 +52,24 @@ public class DataAliases implements Map<String, String> {
 	}
 
 	@Override
-	public Set<java.util.Map.Entry<String, String>> entrySet() {
+	public Set<java.util.Map.Entry<String, Object>> entrySet() {
 		return  map.entrySet();
 	}
 
 	@Override
-	public String get(Object key) {
+	public Object get(Object key) {
 		return map.get(key);
+	}
+
+	public String getAsString(String key) {
+		Object value = get(key);
+		if (value == null) {
+			return null;
+		}
+		if (value instanceof String) {
+			return (String) value;
+		}
+		return value.toString();
 	}
 
 	@Override
@@ -72,17 +83,17 @@ public class DataAliases implements Map<String, String> {
 	}
 
 	@Override
-	public String put(String key, String value) {
+	public Object put(String key, Object value) {
 		return map.put(key, value);
 	}
 
 	@Override
-	public void putAll(Map<? extends String, ? extends String> m) {
+	public void putAll(Map<? extends String, ?> m) {
 		map.putAll(m);
 	}
 
 	@Override
-	public String remove(Object key) {
+	public Object remove(Object key) {
 		return map.remove(key);
 	}
 
@@ -92,7 +103,7 @@ public class DataAliases implements Map<String, String> {
 	}
 
 	@Override
-	public Collection<String> values() {
+	public Collection<Object> values() {
 		return map.values();
 	}	
 	

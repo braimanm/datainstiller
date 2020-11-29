@@ -39,9 +39,11 @@ import java.util.regex.Pattern;
  */
 public class DataAliasesConverter implements Converter {
     private JexlContext jexlContext;
+    private DataAliases globalAliases;
 
-    public DataAliasesConverter(JexlContext jexlContext) {
-        if (jexlContext == null) {
+    public DataAliasesConverter(JexlContext jexlContext, DataAliases globalAliases) {
+        this.globalAliases = globalAliases;
+    	if (jexlContext == null) {
             this.jexlContext = new MapContext();
         } else {
             this.jexlContext = jexlContext;
@@ -59,7 +61,7 @@ public class DataAliasesConverter implements Converter {
 			DataAliases aliases=(DataAliases)source;
 			for (String key:aliases.map.keySet()){
 				writer.startNode(key);
-				writer.setValue(aliases.get(key));
+				writer.setValue(aliases.getAsString(key));
 				writer.endNode();
 			}
 		}
@@ -68,6 +70,9 @@ public class DataAliasesConverter implements Converter {
 	@Override
 	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
 		DataAliases aliases = new DataAliases();
+		if (globalAliases != null) {
+			globalAliases.forEach((key, value)->jexlContext.set(key, value));
+		}
 		String nodeName;
 		String value;
         Object objValue = null;
@@ -90,7 +95,9 @@ public class DataAliasesConverter implements Converter {
                 JxltEngine.Expression expr = jxlt.createExpression(value);
                 try {
                     objValue = expr.evaluate(jexlContext);
-                    value = objValue.toString();
+                    if (objValue != null) {
+						value = objValue.toString();
+					}
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
