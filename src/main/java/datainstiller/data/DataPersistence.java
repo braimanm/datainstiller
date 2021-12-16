@@ -20,6 +20,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.extended.ISO8601GregorianCalendarConverter;
+import com.thoughtworks.xstream.security.AnyTypePermission;
+import com.thoughtworks.xstream.security.NoTypePermission;
+import com.thoughtworks.xstream.security.PrimitiveTypePermission;
 import datainstiller.generators.*;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.MapContext;
@@ -74,6 +77,7 @@ public abstract class DataPersistence {
 
     protected XStream getXstream(DataAliases globalAliases) {
 		XStream xstream = new XStream();
+		xstream.addPermission(AnyTypePermission.ANY);
 		xstream.registerConverter(new DataAliasesConverter(jexlContext, globalAliases));
 		xstream.registerConverter(new ISO8601GregorianCalendarConverter());
 		xstream.processAnnotations(this.getClass());

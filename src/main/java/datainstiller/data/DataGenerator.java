@@ -29,6 +29,7 @@ import com.thoughtworks.xstream.converters.enums.EnumSetConverter;
 import com.thoughtworks.xstream.converters.extended.EncodedByteArrayConverter;
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
 import com.thoughtworks.xstream.core.util.Primitives;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 import datainstiller.generators.*;
 
 import java.lang.reflect.*;
@@ -49,6 +50,7 @@ public class DataGenerator {
 	
 	public DataGenerator(XStream xstream, List<DataValueConverter> converters){
 		this.xstream = xstream;
+		this.xstream.addPermission(AnyTypePermission.ANY);
 		registerGenerator("ADDRESS", new AddressGenerator());
 		registerGenerator("ALPHANUMERIC", new AlphaNumericGenerator());
 		registerGenerator("CUSTOM_LIST",new CustomListGenerator());

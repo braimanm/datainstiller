@@ -4,7 +4,7 @@
 
     <groupId>com.googlecode.datainstiller</groupId>
     <artifactId>datainstiller</artifactId>
-	<version>2.0.2</version>
+	<version>2.1.0</version>
     <packaging>jar</packaging>
     <name>datainstiller</name>
     <url>https://code.google.com/p/datainstiller/</url>
@@ -49,7 +49,7 @@
 		<plugin>
 			<groupId>org.sonatype.plugins</groupId>
 			<artifactId>nexus-staging-maven-plugin</artifactId>
-			<version>1.6.7</version>
+			<version>1.6.8</version>
 			<extensions>true</extensions>
 			<configuration>
 				<serverId>nexus-releases</serverId>
@@ -71,7 +71,7 @@
   				<plugin>
         			<groupId>org.apache.maven.plugins</groupId>
 	        		<artifactId>maven-gpg-plugin</artifactId>
-	        		<version>1.4</version>
+	        		<version>3.0.1</version>
 	        		<executions>
 	          			<execution>
 	            			<id>sign-artifacts</id>
@@ -91,7 +91,7 @@
   	<dependency>
   		<groupId>com.thoughtworks.xstream</groupId>
   		<artifactId>xstream</artifactId>
-        <version>1.4.9</version>
+        <version>1.4.18</version>
   	</dependency>
   	<dependency>
   		<groupId>org.testng</groupId>
@@ -102,12 +102,12 @@
   	<dependency>
   		<groupId>joda-time</groupId>
   		<artifactId>joda-time</artifactId>
-  		<version>2.7</version>
+  		<version>2.10.13</version>
   	</dependency>
 	  <dependency>
 		  <groupId>org.apache.commons</groupId>
 		  <artifactId>commons-jexl3</artifactId>
-		  <version>3.1</version>
+		  <version>3.2.1</version>
 	  </dependency>
   </dependencies>
  
