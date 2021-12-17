@@ -21,8 +21,6 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.converters.extended.ISO8601GregorianCalendarConverter;
 import com.thoughtworks.xstream.security.AnyTypePermission;
-import com.thoughtworks.xstream.security.NoTypePermission;
-import com.thoughtworks.xstream.security.PrimitiveTypePermission;
 import datainstiller.generators.*;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.MapContext;
