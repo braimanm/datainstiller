@@ -1,5 +1,5 @@
 /*
-Copyright 2010-2019 Michael Braiman braimanm@gmail.com
+Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import java.util.Map;
 public class FieldDataStore {
 	private Map<Field,FieldData> fieldDataStore;
 	private DataAliases aliases;
-	
+
 	FieldDataStore() {
 		fieldDataStore = new HashMap<>();
 		aliases = new  DataAliases();
 	}
-	
+
 	public DataAliases getAliases() {
 		return aliases;
 	}
@@ -37,7 +37,7 @@ public class FieldDataStore {
 	public void setAliases(DataAliases aliases) {
 		this.aliases.putAll(aliases);
 	}
-	
+
 	private Field getFieldFromClass(Class<?> clasz, String fieldName){
 		for (Field field : clasz.getDeclaredFields()){
 			if (field.getName().equals(fieldName)){
@@ -46,19 +46,19 @@ public class FieldDataStore {
 		}
 		return null;
 	}
-	
+
 	public FieldData getData(Field field){
-		return fieldDataStore.get(field);  
+		return fieldDataStore.get(field);
 	}
-	
+
 	public FieldData getData(Class<?> clasz, String fieldName){
 		Field field = getFieldFromClass(clasz, fieldName);
 		if (field==null) {
 			return null;
 		}
-		return getData(field);  
+		return getData(field);
 	}
-	
+
 	public void setData(Class<?> clasz, String fieldName, FieldData data){
 		Field field = getFieldFromClass(clasz, fieldName);
 		if (field!=null) {
@@ -72,7 +72,7 @@ public class FieldDataStore {
 		data.setParentStore(this);
 		fieldDataStore.put(field,data);
 	}
-	
+
 	public boolean containsKey(Field key){
 		return fieldDataStore.containsKey(key);
 	}

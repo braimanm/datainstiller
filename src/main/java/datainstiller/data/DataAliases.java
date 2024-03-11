@@ -1,5 +1,5 @@
 /*
-Copyright 2010-2019 Michael Braiman braimanm@gmail.com
+Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,12 +22,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Michael Braiman braimanm@gmail.com
  * 			This class represents aliases store. The only reason to have this class is for serialization and deserialization
- * 			of aliases by special XStream converter {@link DataAliasesConverter}. This class implements Map interface.    
+ * 			of aliases by special XStream converter {@link DataAliasesConverter}. This class implements Map interface.
  */
+@SuppressWarnings("unused")
 public class DataAliases implements Map<String, Object> {
 	@XStreamOmitField
 	Map<String, Object> map;
@@ -35,7 +38,7 @@ public class DataAliases implements Map<String, Object> {
 	public DataAliases() {
 		map = new HashMap<>();
 	}
-	
+
 	@Override
 	public void clear() {
 		map.clear();
@@ -59,6 +62,22 @@ public class DataAliases implements Map<String, Object> {
 	@Override
 	public Object get(Object key) {
 		return map.get(key);
+	}
+
+	public String resolveData(String data) {
+		String value = data;
+		Pattern pat = Pattern.compile("\\$\\{([^}]+)}");
+		Matcher mat = pat.matcher(data);
+		while (mat.find()) {
+			String key = mat.group(1);
+			if (this.containsKey(key)) {
+				String val = this.getAsString(key);
+				if (val != null) {
+					value = value.replace(mat.group(), val);
+				}
+			}
+		}
+		return value;
 	}
 
 	public String getAsString(String key) {
@@ -105,6 +124,6 @@ public class DataAliases implements Map<String, Object> {
 	@Override
 	public Collection<Object> values() {
 		return map.values();
-	}	
-	
+	}
+
 }

@@ -1,5 +1,5 @@
 /*
-Copyright 2010-2019 Michael Braiman braimanm@gmail.com
+Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -27,28 +27,29 @@ import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.MapContext;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 
+ *
  * @author Michael Braiman braimanm@gmail.com
  *          This is{@link XStream} Converter implementation for marshaling and unmarshaling {@link DataAliases} map.
- *          During unmarshaling, if alias value is data generator expression then this expression is resolved to data using specific generator. 
+ *          During unmarshaling, if alias value is data generator expression then this expression is resolved to data using specific generator.
  */
 public class DataAliasesConverter implements Converter {
-    private JexlContext jexlContext;
-    private DataAliases globalAliases;
+	private JexlContext jexlContext;
+	private DataAliases globalAliases;
 
-    public DataAliasesConverter(JexlContext jexlContext, DataAliases globalAliases) {
-        this.globalAliases = globalAliases;
-    	if (jexlContext == null) {
-            this.jexlContext = new MapContext();
-        } else {
-            this.jexlContext = jexlContext;
-        }
-    }
+	public DataAliasesConverter(JexlContext jexlContext, DataAliases globalAliases) {
+		this.globalAliases = globalAliases;
+		if (jexlContext == null) {
+			this.jexlContext = new MapContext();
+		} else {
+			this.jexlContext = jexlContext;
+		}
+	}
 
 	@Override
 	public boolean canConvert(Class type) {
@@ -75,41 +76,41 @@ public class DataAliasesConverter implements Converter {
 		}
 		String nodeName;
 		String value;
-        Object objValue = null;
-        JxltEngine jxlt = new JexlBuilder().strict(true).silent(false).create().createJxltEngine();
-        while (reader.hasMoreChildren()) {
+		Object objValue = null;
+		JxltEngine jxlt = new JexlBuilder().permissions(JexlPermissions.UNRESTRICTED).strict(true).silent(false).create().createJxltEngine();
+		while (reader.hasMoreChildren()) {
 			reader.moveDown();
 			nodeName = reader.getNodeName();
 			value = reader.getValue();
-            if (value.matches("\\$\\[.+]")) {
-                Pattern pattern = Pattern.compile("\\$\\[(.+)\\(\\s*'\\s*(.*)\\s*'\\s*,\\s*'\\s*(.*)\\s*'\\s*\\)");
-                Matcher matcher = pattern.matcher(value);
+			if (value.matches("\\$\\[.+]")) {
+				Pattern pattern = Pattern.compile("\\$\\[(.+)\\(\\s*'\\s*(.*)\\s*'\\s*,\\s*'\\s*(.*)\\s*'\\s*\\)");
+				Matcher matcher = pattern.matcher(value);
 				if (!matcher.find()) {
 					throw new PatternUnmarshalException(value + " - invalid data generation expression!");
-				}	
+				}
 				GeneratorInterface genType = new DataGenerator(new XStream()).getGenerator(matcher.group(1).trim());
 				String init = matcher.group(2);
 				String val = matcher.group(3);
 				value = genType.generate(init, val);
-            } else {
-                JxltEngine.Expression expr = jxlt.createExpression(value);
-                try {
-                    objValue = expr.evaluate(jexlContext);
-                    if (objValue != null) {
+			} else {
+				JxltEngine.Expression expr = jxlt.createExpression(value);
+				try {
+					objValue = expr.evaluate(jexlContext);
+					if (objValue != null) {
 						value = objValue.toString();
 					}
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            aliases.put(nodeName, value);
-            if (objValue != null) {
-                jexlContext.set(nodeName, objValue);
-            } else {
-                jexlContext.set(nodeName, value);
-            }
-            objValue = null;
-            reader.moveUp();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			aliases.put(nodeName, value);
+			if (objValue != null) {
+				jexlContext.set(nodeName, objValue);
+			} else {
+				jexlContext.set(nodeName, value);
+			}
+			objValue = null;
+			reader.moveUp();
 		}
 		return aliases;
 	}

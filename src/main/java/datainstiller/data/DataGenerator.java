@@ -1,5 +1,5 @@
 /*
-Copyright 2010-2019 Michael Braiman braimanm@gmail.com
+Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class DataGenerator {
 	public DataGenerator(XStream xstream) {
 		this(xstream, null);
 	}
-	
+
 	public DataGenerator(XStream xstream, List<DataValueConverter> converters){
 		this.xstream = xstream;
 		this.xstream.addPermission(AnyTypePermission.ANY);
@@ -59,21 +59,21 @@ public class DataGenerator {
 		registerGenerator("WORD",new WordGenerator());
 		registerGenerator("NUMBER",new NumberGenerator());
 		registerGenerator("FILE2LIST",new File2ListGenerator());
-        if (converters != null) {
-            for (Converter converter : converters){
-            	xstream.registerConverter(converter);
-            }
-        }
+		if (converters != null) {
+			for (Converter converter : converters){
+				xstream.registerConverter(converter);
+			}
+		}
 	}
-	
+
 	public GeneratorInterface getGenerator(String generator){
 		return  generatorStore.get(generator);
 	}
-	
+
 	public void registerGenerator(String key, GeneratorInterface generator) {
 		generatorStore.put(key, generator);
 	}
-		
+
 	public int getRecursionLevel() {
 		return recursionLevel;
 	}
@@ -115,21 +115,21 @@ public class DataGenerator {
 	private String getGeneratedValue(FieldData fieldData){
 		String value = fieldData.value();
 		String alias = fieldData.alias();
-        String aliasValue = (alias != null) ? fieldDataStore.getAliases().getAsString(alias) : null;
+		String aliasValue = (alias != null) ? fieldDataStore.getAliases().getAsString(alias) : null;
 
-        if (aliasValue != null) {
-            return "${" + alias + "}";
-        }
+		if (aliasValue != null) {
+			return "${" + alias + "}";
+		}
 
-        if (fieldData.generatorType() != null) {
-            GeneratorInterface generator = generatorStore.get(fieldData.generatorType());
-            if (generator != null) {
-                value = generator.generate(fieldData.pattern(), fieldData.value());
-            } else {
+		if (fieldData.generatorType() != null) {
+			GeneratorInterface generator = generatorStore.get(fieldData.generatorType());
+			if (generator != null) {
+				value = generator.generate(fieldData.pattern(), fieldData.value());
+			} else {
 				throw new GeneratorNotFoundException("Generator " + fieldData.generatorType() + " was not found!");
 			}
 		}
-		
+
 		if (alias!=null) {
 			fieldDataStore.getAliases().put(alias, value);
 			return "${" + alias + "}";
@@ -138,55 +138,55 @@ public class DataGenerator {
 		return value;
 	}
 
-    private String generateValueForField(Class<?> cls, Field field) {
-        String returnValue = null;
-        FieldData fieldData = fieldDataStore.getData(field);
-        if (fieldData != null) {
-            returnValue = getGeneratedValue(fieldData);
-        }
+	private String generateValueForField(Class<?> cls, Field field) {
+		String returnValue = null;
+		FieldData fieldData = fieldDataStore.getData(field);
+		if (fieldData != null) {
+			returnValue = getGeneratedValue(fieldData);
+		}
 		if (cls.isArray()){
 			cls = cls.getComponentType();
 		}
 		if (cls.isPrimitive() || Primitives.unbox(cls) !=null || cls.isEnum()) {
-            if (returnValue == null || returnValue.isEmpty()) {
-            	if (cls.equals(char.class)) {
-            		return "";
+			if (returnValue == null || returnValue.isEmpty()) {
+				if (cls.equals(char.class)) {
+					return "";
 				} else {
 					return "0";
 				}
-            }
-            if (returnValue.startsWith("${")) {
-                return fieldData.resolveAlias();
 			}
-		} 
+			if (returnValue.startsWith("${")) {
+				return fieldData.resolveAlias();
+			}
+		}
 		if (cls.equals(Date.class)){
 			String defaultPattern = "yyyy-MM-dd HH:mm:ss.S z";
 			return new SimpleDateFormat(defaultPattern).format(new Date());
 		}
 
-        if (returnValue == null) {
-            return field.getName();
-        }
-			
+		if (returnValue == null) {
+			return field.getName();
+		}
+
 		return returnValue;
 	}
-	
+
 	private boolean isInnerClass(Class<?> cls){
 		if (cls.isMemberClass() && !Modifier.isStatic(cls.getModifiers())){
 			System.err.println("[WARNING] Only static nested classes are supported. Class " + cls.getCanonicalName() +" should be declared as static!");
 			return true;
-		} 
+		}
 		return false;
 	}
-	
+
 	private void processAnnotations(Class<?> clasz){
 		MetaData metaData = clasz.getAnnotation(MetaData.class);
-        if (metaData != null) {
-            for (Data data : metaData.value()) {
-                Class<?> cls = clasz;
-                if (data.fieldClass() != void.class) {
-                    cls = data.fieldClass();
-                }
+		if (metaData != null) {
+			for (Data data : metaData.value()) {
+				Class<?> cls = clasz;
+				if (data.fieldClass() != void.class) {
+					cls = data.fieldClass();
+				}
 				if (data.fieldName().trim().isEmpty()){
 					throw new AnnotationProcessingException("Field 'fieldName' must be provided in MetaData annotation" + data);
 				}
@@ -197,18 +197,18 @@ public class DataGenerator {
 		do {
 			for (Field field : superClasz.getDeclaredFields()){
 				Data data = field.getAnnotation(Data.class);
-                if (data == null) {
-                    continue;
-                }
+				if (data == null) {
+					continue;
+				}
 				if (!fieldDataStore.containsKey(field)){
-				    fieldDataStore.setData(field, new FieldData(data));
+					fieldDataStore.setData(field, new FieldData(data));
 				}
 			}
 			superClasz = superClasz.getSuperclass();
-        } while (superClasz != null);
-    }
+		} while (superClasz != null);
+	}
 
-    @SuppressWarnings("restriction")
+	@SuppressWarnings("restriction")
 	private Class<?> getGenericTypeOrString(Field field,int argumentNum){
 		Type type = field.getGenericType();
 		if (type instanceof ParameterizedType){
@@ -228,7 +228,7 @@ public class DataGenerator {
 	public <T> T generate(Class<T> cls) {
 
 		T obj = generate(cls, null);
-		
+
 		if (fieldDataStore.getAliases().size()>0 ){
 			boolean dataAliasesFound = false;
 			Class<?> clz = cls;
@@ -247,15 +247,15 @@ public class DataGenerator {
 				}
 				clz = clz.getSuperclass();
 			} while(clz != null);
-			
+
 			if (!dataAliasesFound) {
 				throw new AliasWriteException("Can't save aliases! The generated class or its supper class should have DataAliases type field declared.");
 			}
 		}
-		
+
 		return obj;
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes", "restriction" })
 	private <T> T generate(Class<T> cls, Field ffield) {
 		processAnnotations(cls);
@@ -266,7 +266,7 @@ public class DataGenerator {
 			String stringValue = generateValueForField(cls,ffield);
 			return ((DataValueConverter) conv).fromString(stringValue, cls, ffield);
 		}
-		
+
 		if (conv instanceof SingleValueConverter && !(conv instanceof EncodedByteArrayConverter)) {
 			String stringValue = generateValueForField(cls,ffield);
 			Object value = ((SingleValueConverter) conv).fromString(stringValue);
@@ -277,7 +277,7 @@ public class DataGenerator {
 		if (conv instanceof ArrayConverter || conv instanceof CharArrayConverter || conv instanceof EncodedByteArrayConverter){
 			int n = getnArrayForField(ffield);
 			T array = (T) Array.newInstance(cls.getComponentType(), n);
-            Object element = generate(cls.getComponentType(), ffield);
+			Object element = generate(cls.getComponentType(), ffield);
 			for (int i=0; i<n; i++){
 				if (i > 0) {
 					element = deepCopy(element);
@@ -313,13 +313,13 @@ public class DataGenerator {
 				return null;
 			}
 		}
-		
+
 		if (conv instanceof CollectionConverter){
 			int n = getnArrayForField(ffield);
-            Collection collection;
-            if (concreteCollectionClass == null) concreteCollectionClass = cls;
-            try {
-            	collection = (Collection) concreteCollectionClass.newInstance();
+			Collection collection;
+			if (concreteCollectionClass == null) concreteCollectionClass = cls;
+			try {
+				collection = (Collection) concreteCollectionClass.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
@@ -336,7 +336,7 @@ public class DataGenerator {
 			recursionCounter.reset(ffield);
 			return (T) collection;
 		}
-		
+
 		if (conv instanceof MapConverter){
 			Map map = null;
 			if (concreteCollectionClass == null) concreteCollectionClass = cls;
@@ -354,11 +354,11 @@ public class DataGenerator {
 			}
 			return (T) map;
 		}
-		
+
 		if (conv instanceof EnumConverter){
 			return cls.getEnumConstants()[Integer.parseInt(generateValueForField(cls,ffield))];
 		}
-		
+
 		if (conv instanceof EnumSetConverter){
 			Type type = ffield.getGenericType();
 			if (type instanceof ParameterizedType){
@@ -367,7 +367,7 @@ public class DataGenerator {
 				return (T) EnumSet.of(e);
 			}
 		}
-		
+
 		if (conv instanceof ReflectionConverter) {
 
 			Object obj = xstream.getReflectionProvider().newInstance(cls);
@@ -383,15 +383,15 @@ public class DataGenerator {
 			Class superCls = cls;
 			do {
 				for (Field field : superCls.getDeclaredFields()){
-                    if (isInnerClass(field.getType())) {
-                        System.err.println("          Field '" + field.getName() + "' was skipped by generator.");
-                        continue;
+					if (isInnerClass(field.getType())) {
+						System.err.println("          Field '" + field.getName() + "' was skipped by generator.");
+						continue;
 					}
 					field.setAccessible(true);
 					FieldData fieldData = fieldDataStore.getData(field);
-                    if (fieldData != null && fieldData.skip()) {
-                        continue;
-                    }
+					if (fieldData != null && fieldData.skip()) {
+						continue;
+					}
 					if (field.isAnnotationPresent(XStreamOmitField.class)){
 						continue;
 					}
@@ -402,16 +402,16 @@ public class DataGenerator {
 					Object value = generate(field.getType(), field);
 					try {
 						field.set(obj, value);
-                    } catch (IllegalArgumentException | IllegalAccessException | NullPointerException e) {
-                        throw new RuntimeException(e);
-                    }
+					} catch (IllegalArgumentException | IllegalAccessException | NullPointerException e) {
+						throw new RuntimeException(e);
+					}
 				}
 				superCls = superCls.getSuperclass();
 			} while (superCls != null);
 
 			return (T) obj;
 		}
-		
+
 		if (conv instanceof DataAliasesConverter) {
 			//No data should be generated for DataAliasesConverter
 			return null;
@@ -420,5 +420,5 @@ public class DataGenerator {
 		System.err.println("[WARNING] Converter type: " + conv.getClass().getName() + ". Can't generate data for field " + ffield);
 		return null;
 	}
-	
+
 }

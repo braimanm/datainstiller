@@ -1,5 +1,5 @@
 /*
-Copyright 2010-2019 Michael Braiman braimanm@gmail.com
+Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,31 +36,32 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * @author Michael Braiman braimanm@gmail.com
- *
+ * <p>
  * This class encapsulate object persistence capabilities. It allows to persist any derived from this class object with all his data.
- * All the class members which are not annotated with {@link XStreamOmitField} are serialized and deserialized to and from various formats 
+ * All the class members which are not annotated with {@link XStreamOmitField} are serialized and deserialized to and from various formats
  */
+@SuppressWarnings("unused")
 public abstract class DataPersistence {
 	@XStreamOmitField
 	private JexlContext jexlContext;
 	@Data(skip = true)
-    @XStreamAlias("xmlns")
-    @XStreamAsAttribute
-    protected String xmlns;
-    @Data(skip = true)
-    @XStreamAlias("xmlns:xsi")
-    @XStreamAsAttribute
+	@XStreamAlias("xmlns")
+	@XStreamAsAttribute
+	protected String xmlns;
+	@Data(skip = true)
+	@XStreamAlias("xmlns:xsi")
+	@XStreamAsAttribute
 	protected String xsi;
-    @Data(skip = true)
-    @XStreamAlias("xsi:schemaLocation")
-    @XStreamAsAttribute
+	@Data(skip = true)
+	@XStreamAlias("xsi:schemaLocation")
+	@XStreamAsAttribute
 	protected String schemaLocation;
 	@Data(skip = true)
 	private DataAliases aliases;
 
 	protected DataPersistence() {
 	}
-	
+
 	public DataAliases getDataAliases(){
 		return aliases;
 	}
@@ -73,7 +74,7 @@ public abstract class DataPersistence {
 		return getXstream(null);
 	}
 
-    protected XStream getXstream(DataAliases globalAliases) {
+	protected XStream getXstream(DataAliases globalAliases) {
 		XStream xstream = new XStream();
 		xstream.addPermission(AnyTypePermission.ANY);
 		xstream.registerConverter(new DataAliasesConverter(jexlContext, globalAliases));
@@ -83,7 +84,7 @@ public abstract class DataPersistence {
 	}
 
 	private void initJexlContext() {
-	    JexlContext jContext = new MapContext();
+		JexlContext jContext = new MapContext();
 		jContext.set("AddressGen", new AddressGenerator());
 		jContext.set("AlphaNumericGen", new AlphaNumericGenerator());
 		jContext.set("ListGen", new CustomListGenerator());
@@ -186,11 +187,11 @@ public abstract class DataPersistence {
 		}
 		return retainFields(data);
 	}
-	
+
 	public  <T extends DataPersistence> T fromXml(String xml) {
 		return fromXml(xml,false);
 	}
-	
+
 	/**
 	 * This method deserialize file represented by URL to the object
 	 * @param url URL pointer to the file to be deserialized
@@ -206,18 +207,18 @@ public abstract class DataPersistence {
 		}
 		return retainFields(data);
 	}
-	
+
 	public  <T extends DataPersistence> T fromURL(URL url){
 		return fromURL(url,false);
 	}
-	
+
 	/**
 	 * This method deserialize {@link InputStream} to the object
 	 * @param inputStream input stream to deserialize from
 	 * @param resolveAliases resolve aliases during serialization
 	 * @return deserialized object
 	 */
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends DataPersistence> T fromInputStream(InputStream inputStream, boolean resolveAliases) {
 		initJexlContext();
@@ -227,11 +228,11 @@ public abstract class DataPersistence {
 		}
 		return retainFields(data);
 	}
-	
+
 	public  <T extends DataPersistence> T fromInputStream(InputStream inputStream) {
 		return fromInputStream(inputStream,false);
 	}
-	
+
 	/**
 	 * This method deserialize given resource file to the object 
 	 * @param resourceFilePath path of resource file to deserialize from
@@ -249,11 +250,11 @@ public abstract class DataPersistence {
 		}
 		throw new RuntimeException("File '" + resourceFilePath + "' was not found!");
 	}
-	
+
 	public  <T extends DataPersistence> T fromResource(String resourceFile){
 		return fromResource(resourceFile, false);
 	}
-	
+
 	/**
 	 * This method deserialize given file to the object 
 	 * @param filePath file path to deserialize from
@@ -277,7 +278,7 @@ public abstract class DataPersistence {
 	public  <T extends DataPersistence> T fromFile(String filePath){
 		return fromFile(filePath, false);
 	}
-	
+
 	/**
 	 * This method serializes this object to the given XML string
 	 * @return XML representation of this object 
@@ -288,7 +289,7 @@ public abstract class DataPersistence {
 		String xml = xstream.toXML(this).replaceAll(" xmlns=.*", ">"); // Remove xml namespaces;
 		return header + xml;
 	}
-	
+
 	/**
 	 * This method serializes this object to the given file
 	 * @param filePath file path to serialize this object
@@ -301,7 +302,7 @@ public abstract class DataPersistence {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
 	 * Copying one object to another
 	 * @param source object to copy from
@@ -312,12 +313,12 @@ public abstract class DataPersistence {
 		String xml=xstream.toXML(source);
 		xstream.fromXML(xml,target);
 	}
-	
+
 	public void generateData(){
 		DataPersistence obj = new DataGenerator(getXstream()).generate(this.getClass());
 		deepCopy(obj, this);
 	}
-	
+
 	public String generateXML(){
 		DataPersistence obj = new DataGenerator(getXstream()).generate(this.getClass());
 		return obj.toXML();
@@ -328,5 +329,5 @@ public abstract class DataPersistence {
 	protected void generate() {
 		System.out.println(generateXML());
 	}
-	
+
 }

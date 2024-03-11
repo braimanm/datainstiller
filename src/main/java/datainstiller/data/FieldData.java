@@ -1,5 +1,5 @@
 /*
-Copyright 2010-2019 Michael Braiman braimanm@gmail.com
+Copyright 2010-2024 Michael Braiman braimanm@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ Copyright 2010-2019 Michael Braiman braimanm@gmail.com
 
 package datainstiller.data;
 
+@SuppressWarnings("unused")
 public class FieldData {
 	private Class<?>[] clasz = null;
 	private String alias = null;
@@ -26,10 +27,10 @@ public class FieldData {
 	private int nRecursion = 0;
 	private boolean skipField;
 	private FieldDataStore fieldDataStore;
-	
+
 	public FieldData() {
 	}
-	
+
 	public FieldData(Data data) {
 		//noinspection EqualsBetweenInconvertibleTypes
 		clasz = (data.clasz().equals(void.class)) ? null : data.clasz();
@@ -71,7 +72,7 @@ public class FieldData {
 	public String alias() {
 		return alias;
 	}
-	
+
 	public int nArray() {
 		return nArray;
 	}
@@ -88,7 +89,7 @@ public class FieldData {
 		this.clasz = clasz;
 		return this;
 	}
-	
+
 	public FieldData setClasz(Class<?> clasz) {
 		this.clasz = new Class<?>[] {clasz};
 		return this;
@@ -128,5 +129,5 @@ public class FieldData {
 		this.skipField = skipField;
 		return this;
 	}
-	
+
 }

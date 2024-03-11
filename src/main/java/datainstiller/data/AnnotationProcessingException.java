@@ -1,5 +1,5 @@
 /*
-Copyright 2010-2019 Michael Braiman
+Copyright 2010-2024 Michael Braiman
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
