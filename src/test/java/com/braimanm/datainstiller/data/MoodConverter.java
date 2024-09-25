@@ -29,7 +29,7 @@ public class MoodConverter implements DataValueConverter {
 	@Override
 	public Object unmarshal(HierarchicalStreamReader reader,UnmarshallingContext context) {
 		
-		Object obj =null;
+		Object obj;
 		try {
 			obj = context.getRequiredType().newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
@@ -43,7 +43,7 @@ public class MoodConverter implements DataValueConverter {
 
 	@Override
 	public <T> T fromString(String str, Class<T> cls, Field field) {
-		T obj =null;
+		T obj;
 		try {
 			obj = cls.newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
