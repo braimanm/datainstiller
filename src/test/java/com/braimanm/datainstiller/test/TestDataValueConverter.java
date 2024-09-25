@@ -11,6 +11,7 @@ import java.util.List;
 public class TestDataValueConverter {
 
 	@SuppressWarnings("unused")
+    static
     class LocalData extends DataPersistence {
 		MoodData1 mood1;
 		MoodData1 mood11;
