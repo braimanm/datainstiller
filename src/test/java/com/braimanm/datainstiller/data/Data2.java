@@ -1,5 +1,6 @@
 package com.braimanm.datainstiller.data;
 
+@SuppressWarnings({"NewClassNamingConvention", "unused"})
 public class Data2 extends DataPersistence {
 	public byte byte1;
 	public Byte byte2;

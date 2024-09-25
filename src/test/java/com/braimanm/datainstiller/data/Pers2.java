@@ -1,6 +1,6 @@
 package com.braimanm.datainstiller.data;
 
-
+@SuppressWarnings({"NewClassNamingConvention", "unused"})
 public class Pers2 extends DataPersistence {
     String s1;
     @Data(alias = "string2")
