@@ -2,6 +2,7 @@ package com.braimanm.datainstiller.data;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+@SuppressWarnings("NewClassNamingConvention")
 @XStreamAlias("retain")
 public class RetainData extends DataPersistence {
     public byte b;

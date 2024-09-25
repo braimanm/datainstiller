@@ -10,7 +10,8 @@ import java.util.List;
 
 public class TestDataValueConverter {
 
-	class LocalData extends DataPersistence {
+	@SuppressWarnings("unused")
+    class LocalData extends DataPersistence {
 		MoodData1 mood1;
 		MoodData1 mood11;
 		MoodData2 mood2;

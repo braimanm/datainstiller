@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import java.util.List;
 
+@SuppressWarnings({"NewClassNamingConvention", "unused"})
 @XStreamAlias("person")
 public class Person extends DataPersistence {
     public String firstName;

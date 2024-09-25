@@ -9,7 +9,6 @@ import java.lang.reflect.Field;
 
 public class MoodConverter implements DataValueConverter {
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean canConvert(Class type) {
 		return (MoodInterface.class.isAssignableFrom(type));

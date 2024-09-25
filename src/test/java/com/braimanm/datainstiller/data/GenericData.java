@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import java.util.List;
 
+@SuppressWarnings({"NewClassNamingConvention", "unused"})
 @XStreamAlias("generic-data")
 public class GenericData extends DataPersistence {
     List<Entity> entities;

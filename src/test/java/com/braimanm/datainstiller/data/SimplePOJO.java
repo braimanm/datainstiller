@@ -2,7 +2,7 @@ package com.braimanm.datainstiller.data;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"NewClassNamingConvention", "unused"})
 @XStreamAlias("simple-pojo")
 public class SimplePOJO extends DataPersistence {
 	private byte bytePrimitive;

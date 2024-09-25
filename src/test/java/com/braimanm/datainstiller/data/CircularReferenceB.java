@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import java.util.List;
 
+@SuppressWarnings({"NewClassNamingConvention", "unused"})
 @XStreamAlias("CLASS-B")
 public class CircularReferenceB extends DataPersistence {
     String someOtherValue;
