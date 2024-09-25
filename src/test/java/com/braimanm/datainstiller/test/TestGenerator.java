@@ -14,7 +14,7 @@ public class TestGenerator {
 
 	@SuppressWarnings("unused")
     @XStreamAlias("data1")
-	class LocalData extends DataPersistence {
+	  class LocalData extends DataPersistence {
 		byte byte1;
 		Byte byte2;
 		short short1;

@@ -24,8 +24,6 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,9 +34,8 @@ import java.util.regex.Pattern;
  *          This is{@link XStream} Converter implementation for marshaling and unmarshaling {@link DataAliases} map.
  *          During unmarshaling, if alias value is data generator expression then this expression is resolved to data using specific generator. 
  */
+@SuppressWarnings("unused")
 public class DataAliasesConverter implements Converter {
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
 	@Override
 	public boolean canConvert(Class type) {
 		return (type.equals(DataAliases.class));

@@ -5,7 +5,7 @@
   	<ALIAS>$[ALPHANUMERIC('([a][b][c]) [d][e][f]-[g][h][i][j]','null')]</ALIAS>
     <ALIAS2>$[DATE('dd MMM yyyy','1945/01/01|1995/12/31|yyyy/MM/dd')]</ALIAS2>
     <name>$[HUMAN_NAMES('{A} {S}', 'null')]</name>
-    <address></address>
+    <address/>
   </aliases>
   <byte1>0</byte1>
   <byte2>0</byte2>

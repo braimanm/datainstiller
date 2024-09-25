@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
  * 			This class represents aliases store. The only reason to have this class is for serialization and deserialization
  * 			of aliases by special XStream converter {@link DataAliasesConverter}. This class implements Map interface.    
  */
+@SuppressWarnings("unused")
 @XStreamConverter(DataAliasesConverter.class)
 public class DataAliases implements Map<String, Object> {
 	@XStreamOmitField

@@ -33,7 +33,7 @@ public class SimplePOJOArray extends DataPersistence {
 	private boolean[] booleanPrimitive;
 	@Data(alias = "booleanTrue")
 	private Boolean[] booleanType;
-	@Data(alias = "charPrimitive", value = "\u0061")
+	@Data(alias = "charPrimitive", value = "a")
 	private char[] charPrimitive;
 	@Data(alias = "characterType", value = "a")
 	private Character[] characterType;

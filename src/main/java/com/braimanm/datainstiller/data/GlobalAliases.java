@@ -2,8 +2,6 @@ package com.braimanm.datainstiller.data;
 
 import org.apache.commons.jexl3.*;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GlobalAliases extends DataAliases {
     private final JexlContext jexlContext = new MapContext(this);
