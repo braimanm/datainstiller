@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <array-simple-pojo>
+    <aliases>
+        <doubleType>11</doubleType>
+        <floatPrimitive>8</floatPrimitive>
+        <intPrimitive>4</intPrimitive>
+        <integerType>5</integerType>
+        <shortType>3</shortType>
+        <byteType>1</byteType>
+        <longType>7</longType>
+        <bytePrimitive>0</bytePrimitive>
+        <floatType>9</floatType>
+        <characterType>a</characterType>
+        <charPrimitive>a</charPrimitive>
+        <booleanTrue>true</booleanTrue>
+        <stringType>stringType</stringType>
+        <longPrimitive>6</longPrimitive>
+        <doublePrimitive>10</doublePrimitive>
+        <shortPrimitive>2</shortPrimitive>
+    </aliases>
     <bytePrimitive>AAAA</bytePrimitive>
     <byteType>
         <byte>1</byte>
@@ -77,8 +95,8 @@
         <char>a</char>
     </characterType>
     <stringType>
-        <string>stringType</string>
-        <string>stringType</string>
-        <string>stringType</string>
+        <string>${stringType}</string>
+        <string>${stringType}</string>
+        <string>${stringType}</string>
     </stringType>
 </array-simple-pojo>

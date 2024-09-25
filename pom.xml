@@ -2,119 +2,123 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.googlecode.datainstiller</groupId>
+    <groupId>com.braimanm</groupId>
     <artifactId>datainstiller</artifactId>
-	<version>2.2.0</version>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
     <name>datainstiller</name>
-    <url>https://code.google.com/p/datainstiller/</url>
+    <url>https://github.com/braimanm/datainstiller</url>
     <licenses>
-      <license>
-        <name>The Apache Software License, Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        <distribution>repo</distribution>
-      </license>
-  	</licenses>
-  	<description>This project allows to instantiate any given Java class with randomly generated data.</description>
-  	<scm>
-  		<url>https://code.google.com/p/datainstiller/</url>
-  		<connection>scm:svn:http://datainstiller.googlecode.com/svn/</connection>
-  		<developerConnection>scm:svn:http://datainstiller.googlecode.com/svn/</developerConnection>
-  	</scm>
-  
-  
-  <developers>
-    <developer>
-      <name>Michael Braiman</name>
-      <email>braimanm@gmail.com</email>
-    </developer>
-  </developers>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <description>This project allows to instantiate any given Java class with randomly generated data.</description>
 
-	<properties>
-		<java.version>8</java.version>
-		<xstream.version>1.4.20</xstream.version>
-		<commons-jexl3.version>3.3</commons-jexl3.version>
-		<testng.version>7.9.0</testng.version>
-		<joda-time.version>2.12.7</joda-time.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <developers>
+        <developer>
+            <name>Michael Braiman</name>
+            <email>braimanm@gmail.com</email>
+        </developer>
+    </developers>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.10.1</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.13</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>nexus-releases</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>false</autoReleaseAfterClose>
-					<!--				<skipStagingRepositoryClose>true</skipStagingRepositoryClose>-->
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <properties>
+        <java.version>11</java.version>
+        <xstream.version>1.4.20</xstream.version>
+        <commons-jexl3.version>3.3</commons-jexl3.version>
+        <testng.version>7.10.0</testng.version>
+        <joda-time.version>2.12.7</joda-time.version>
+        <logback.version>1.5.3</logback.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-	<profiles>
-		<profile>
-			<id>gpg.sign</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>3.1.0</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.13</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>nexus-releases</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <!--				<skipStagingRepositoryClose>true</skipStagingRepositoryClose>-->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>${xstream.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>${testng.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>${joda-time.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-jexl3</artifactId>
-			<version>${commons-jexl3.version}</version>
-		</dependency>
-	</dependencies>
+    <profiles>
+        <profile>
+            <id>gpg.sign</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>${xstream.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-jexl3</artifactId>
+            <version>${commons-jexl3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.12</version>
+        </dependency>
+    </dependencies>
 
 </project>

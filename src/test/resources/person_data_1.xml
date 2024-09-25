@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<person>
+    <aliases>
+        <firstName global="">Michael</firstName>
+        <lastName global="">Smith</lastName>
+        <workStreetNumber>40</workStreetNumber>
+        <workStreetName>King Street West</workStreetName>
+        <workPostalCode>A1A 2B2</workPostalCode>
+        <workProvince>Ontario</workProvince>
+        <workCity>Toronto</workCity>
+        <workCountry>Canada</workCountry>
+        <currentTime>${now}</currentTime>
+        <phone>$[ALPHANUMERIC('([a][b][c]) [d][e][f]-[g][h][i][j]','null')]</phone>
+    </aliases>
+    <firstName>${firstName}</firstName>
+    <lastName>${lastName}</lastName>
+    <fullName>${firstName} ${lastName}</fullName>
+    <age>35</age>
+    <todayDate>${DateTimeFormatter.format(now)}</todayDate>
+    <now>${now}</now>
+    <workAddress>
+        <streetNumber>${workStreetNumber}</streetNumber>
+        <streetName>${workStreetName}</streetName>
+        <postalCode>${workPostalCode}</postalCode>
+        <province>${workProvince}</province>
+        <city>${workCity}</city>
+        <country>${workCountry}</country>
+    </workAddress>
+    <knownAddresses>
+        <address>
+            <streetNumber>streetNumber1</streetNumber>
+            <streetName>streetName1</streetName>
+            <postalCode>postalCode1</postalCode>
+            <province>province1</province>
+            <city>city1</city>
+            <country>country1</country>
+        </address>
+        <address>
+            <streetNumber>streetNumber2</streetNumber>
+            <streetName>streetName2</streetName>
+            <postalCode>postalCode2</postalCode>
+            <province>province2</province>
+            <city>city2</city>
+            <country>country2</country>
+        </address>
+    </knownAddresses>
+</person>
