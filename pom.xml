@@ -8,6 +8,9 @@
     <packaging>jar</packaging>
     <name>datainstiller</name>
     <url>https://github.com/braimanm/datainstiller</url>
+    <scm>
+        <url>https://github.com/braimanm/datainstiller</url>
+    </scm>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -49,11 +52,11 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
+                <version>1.7.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>nexus-releases</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <serverId>nexus-releases01</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>false</autoReleaseAfterClose>
                     <!--				<skipStagingRepositoryClose>true</skipStagingRepositoryClose>-->
                 </configuration>
