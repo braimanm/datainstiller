@@ -4,7 +4,7 @@
 
     <groupId>com.braimanm</groupId>
     <artifactId>datainstiller</artifactId>
-    <version>3.0.0</version>
+    <version>3.2.0</version>
     <packaging>jar</packaging>
     <name>datainstiller</name>
     <url>https://github.com/braimanm/datainstiller</url>
@@ -29,7 +29,7 @@
 
     <properties>
         <java.version>11</java.version>
-        <xstream.version>1.4.20</xstream.version>
+        <xstream.version>1.4.21</xstream.version>
         <commons-jexl3.version>3.3</commons-jexl3.version>
         <testng.version>7.10.0</testng.version>
         <joda-time.version>2.12.7</joda-time.version>
