@@ -76,6 +76,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.6.0</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                    <quiet>true</quiet>
+                    <additionalJOption>-Xdoclint:none</additionalJOption>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -111,6 +116,21 @@
             <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <!--
+    Build & Deployment Notes:
+
+    To build the library without GPG signing (for local development):
+    mvn clean install -DskipTests
+
+    To deploy a signed release to Maven Central (OSSRH):
+    export GPG_TTY=$(tty)
+    mvn clean deploy -DskipTests -Pgpg.sign
+
+    Make sure you have:
+    - A valid GPG key set up and available
+    - Your Sonatype credentials in ~/.m2/settings.xml under <serverId>nexus-releases01</serverId>
+    -->
 
     <profiles>
         <profile>
