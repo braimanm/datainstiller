@@ -72,8 +72,8 @@ public class DataAliases implements Map<String, Object> {
 		return map.get(key);
 	}
 
-	public String resolveAliases(Object data) {
-		return resolveAliases(data.toString());
+	public String resolveAliases(DataPersistence data) {
+		return resolveAliases(data.toXML());
 	}
 
 	public String resolveAliases(String data) {
